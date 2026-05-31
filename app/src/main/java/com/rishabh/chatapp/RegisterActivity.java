@@ -8,7 +8,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.net.Uri;
+import android.widget.LinearLayout;
+import de.hdodenhof.circleimageview.CircleImageView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,6 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    CircleImageView profileImage;
+
+    LinearLayout changePhotoBtn;
+
+    Uri selectedImageUri;
 
     EditText firstName;
     EditText lastName;
@@ -33,6 +44,23 @@ public class RegisterActivity extends AppCompatActivity {
 
     DatabaseReference db;
 
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+
+                        if (result.getResultCode() == RESULT_OK
+                                && result.getData() != null) {
+
+                            selectedImageUri =
+                                    result.getData().getData();
+
+                            profileImage.setImageURI(
+                                    selectedImageUri
+                            );
+                        }
+                    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -43,6 +71,12 @@ public class RegisterActivity extends AppCompatActivity {
         // =========================
         // FIND VIEWS
         // =========================
+
+        profileImage =
+                findViewById(R.id.profileImage);
+
+        changePhotoBtn =
+                findViewById(R.id.changePhotoBtn);
 
         firstName =
                 findViewById(R.id.firstName);
@@ -67,6 +101,20 @@ public class RegisterActivity extends AppCompatActivity {
 
         progressBar =
                 findViewById(R.id.progressBar);
+
+        // =========================
+        // FIREBASE
+        // =========================
+
+        changePhotoBtn.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(Intent.ACTION_PICK);
+
+            intent.setType("image/*");
+
+            imagePickerLauncher.launch(intent);
+        });
 
         // =========================
         // FIREBASE
@@ -163,7 +211,9 @@ public class RegisterActivity extends AppCompatActivity {
                                         l,
                                         u,
                                         e,
-                                        "",
+                                        selectedImageUri == null
+                                                ? "default"
+                                                : selectedImageUri.toString(),
                                         "Online",
                                         "",
                                         0

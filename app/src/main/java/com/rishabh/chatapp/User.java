@@ -28,6 +28,8 @@ public class User {
 
     public String status = "Offline";
 
+    public long lastSeen = 0;
+
     // =========================
     // CHAT INFO
     // =========================

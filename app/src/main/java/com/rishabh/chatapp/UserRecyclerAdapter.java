@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import de.hdodenhof.circleimageview.CircleImageView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -97,20 +97,11 @@ public class UserRecyclerAdapter
         // PROFILE IMAGE
         // =========================
 
-        if (user.profileImage != null &&
-                !user.profileImage.isEmpty() &&
-                !user.profileImage.equals("default")) {
-
-            Glide.with(context)
-                    .load(user.profileImage)
-                    .into(holder.profileImage);
-
-        } else {
-
-            holder.profileImage.setImageResource(
-                    R.drawable.default_profile
-            );
-        }
+        Glide.with(context)
+                .load(user.profileImage)
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .into(holder.profileImage);
 
         holder.mutualText.setText(
                 "People you may know"
@@ -246,7 +237,7 @@ public class UserRecyclerAdapter
     public static class UserViewHolder
             extends RecyclerView.ViewHolder {
 
-        ImageView profileImage;
+        CircleImageView profileImage;
 
         TextView username;
 

@@ -40,11 +40,11 @@ public class UserAdapter extends BaseAdapter {
         name.setText(user.username);
 
         // 🔥 Load image
-        if (user.profileImage != null && !user.profileImage.isEmpty()) {
-            Glide.with(context).load(user.profileImage).into(img);
-        } else {
-            img.setImageResource(R.mipmap.ic_launcher);
-        }
+        Glide.with(context)
+                .load(user.profileImage)
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .into(img);
 
         return view;
     }

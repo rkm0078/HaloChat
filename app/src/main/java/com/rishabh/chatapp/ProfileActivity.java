@@ -1,73 +1,123 @@
 package com.rishabh.chatapp;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.widget.Toast;
 
-import java.util.HashMap;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class ProfileActivity extends AppCompatActivity {
 
+    private static final int PICK_IMAGE = 101;
+    ImageView backBtn;
+    ImageView profileImage;
+
+    LinearLayout changePhotoBtn;
+
+    TextView fullName;
+    TextView username;
+
+    TextView fullNameDetail;
+    TextView usernameDetail;
+
     TextView emailText;
-
-    EditText usernameEdit;
-    EditText passwordEdit;
-
-    Button updateUsernameBtn;
-    Button updatePasswordBtn;
-    Button logoutBtn;
-    Button deleteBtn;
 
     FirebaseAuth auth;
     DatabaseReference db;
 
+    private Uri selectedImageUri;
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+
+                        if (result.getResultCode() == RESULT_OK &&
+                                result.getData() != null) {
+
+                            selectedImageUri =
+                                    result.getData().getData();
+
+                            Glide.with(ProfileActivity.this)
+                                    .load(selectedImageUri)
+                                    .into(profileImage);
+
+                            uploadToCloudinary(selectedImageUri);
+                        }
+                    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+
+
+        backBtn =
+                findViewById(R.id.backBtn);
+
+        profileImage =
+                findViewById(R.id.profileImage);
+
+        changePhotoBtn =
+                findViewById(R.id.changePhotoBtn);
+
+        fullName =
+                findViewById(R.id.fullName);
+
+        username =
+                findViewById(R.id.username);
+
+        fullNameDetail =
+                findViewById(R.id.fullNameDetail);
+
+        usernameDetail =
+                findViewById(R.id.usernameDetail);
+
         emailText =
                 findViewById(R.id.emailText);
-
-//        usernameEdit =
-//                findViewById(R.id.usernameEdit);
-//
-//        passwordEdit =
-//                findViewById(R.id.passwordEdit);
-//
-//        updateUsernameBtn =
-//                findViewById(R.id.updateUsernameBtn);
-//
-//        updatePasswordBtn =
-//                findViewById(R.id.updatePasswordBtn);
-
-        logoutBtn =
-                findViewById(R.id.logoutBtn);
-
-        deleteBtn =
-                findViewById(R.id.deleteBtn);
 
         auth = FirebaseAuth.getInstance();
 
         db = FirebaseDatabase.getInstance()
                 .getReference("Users");
 
-        FirebaseUser user =
+        FirebaseUser firebaseUser =
                 auth.getCurrentUser();
 
-        String uid = user.getUid();
+        if (firebaseUser == null) {
 
-        // 🔥 LOAD USER DATA
+            finish();
+            return;
+        }
+
+        String uid =
+                firebaseUser.getUid();
 
         db.child(uid)
                 .addListenerForSingleValueEvent(
@@ -75,123 +125,200 @@ public class ProfileActivity extends AppCompatActivity {
 
                             @Override
                             public void onDataChange(
-                                    @NonNull DataSnapshot snapshot) {
+                                    @NonNull DataSnapshot snapshot
+                            ) {
 
-                                User u =
-                                        snapshot.getValue(User.class);
+                                User user =
+                                        snapshot.getValue(
+                                                User.class
+                                        );
 
-                                if (u != null) {
+                                if (user == null)
+                                    return;
 
-                                    usernameEdit.setText(u.username);
+                                String name =
+                                        user.getFullName();
 
-                                    emailText.setText(u.email);
-                                }
+                                fullName.setText(name);
+
+                                fullNameDetail.setText(name);
+
+                                username.setText(
+                                        user.username
+                                );
+
+                                usernameDetail.setText(
+                                        user.username
+                                );
+
+                                emailText.setText(
+                                        user.email
+                                );
+
+                                Glide.with(ProfileActivity.this)
+                                        .load(user.profileImage)
+                                        .placeholder(R.drawable.default_profile)
+                                        .error(R.drawable.default_profile)
+                                        .into(profileImage);
                             }
 
                             @Override
                             public void onCancelled(
-                                    @NonNull DatabaseError error) {
+                                    @NonNull DatabaseError error
+                            ) {
 
                             }
                         });
 
-        // 🔥 UPDATE USERNAME
+        backBtn.setOnClickListener(v -> finish());
 
-        updateUsernameBtn.setOnClickListener(v -> {
+        changePhotoBtn.setOnClickListener(v -> {
 
-            String newUsername =
-                    usernameEdit.getText()
-                            .toString()
-                            .trim();
+            Intent intent =
+                    new Intent(Intent.ACTION_PICK);
 
-            HashMap<String, Object> map =
-                    new HashMap<>();
+            intent.setType("image/*");
 
-            map.put("username", newUsername);
+            imagePickerLauncher.launch(intent);
 
-            db.child(uid)
-                    .updateChildren(map)
-                    .addOnSuccessListener(unused -> {
+        });
+    }
 
-                        Toast.makeText(
-                                this,
-                                "Username Updated",
-                                Toast.LENGTH_SHORT
-                        ).show();
+    private void uploadToCloudinary(Uri imageUri) {
+
+        Toast.makeText(
+                this,
+                "Uploading...",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        String cloudName = "domvygmqx";
+        String uploadPreset = "halochat_profiles";
+
+        try {
+
+            byte[] imageBytes =
+                    getContentResolver()
+                            .openInputStream(imageUri)
+                            .readAllBytes();
+
+            RequestBody requestBody =
+                    new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart(
+                                    "file",
+                                    "profile.jpg",
+                                    RequestBody.create(imageBytes)
+                            )
+                            .addFormDataPart(
+                                    "upload_preset",
+                                    uploadPreset
+                            )
+                            .build();
+
+            Request request =
+                    new Request.Builder()
+                            .url(
+                                    "https://api.cloudinary.com/v1_1/"
+                                            + cloudName
+                                            + "/image/upload"
+                            )
+                            .post(requestBody)
+                            .build();
+
+            OkHttpClient client =
+                    new OkHttpClient();
+
+            client.newCall(request)
+                    .enqueue(new Callback() {
+
+                        @Override
+                        public void onFailure(
+                                Call call,
+                                IOException e
+                        ) {
+
+                            runOnUiThread(() ->
+                                    Toast.makeText(
+                                            ProfileActivity.this,
+                                            "Upload Failed",
+                                            Toast.LENGTH_LONG
+                                    ).show()
+                            );
+                        }
+
+                        @Override
+                        public void onResponse(
+                                Call call,
+                                Response response
+                        ) throws IOException {
+
+                            String json =
+                                    response.body().string();
+
+                            try {
+
+                                JSONObject object =
+                                        new JSONObject(json);
+
+                                String imageUrl =
+                                        object.getString(
+                                                "secure_url"
+                                        );
+
+                                FirebaseUser user =
+                                        FirebaseAuth
+                                                .getInstance()
+                                                .getCurrentUser();
+
+                                if (user == null)
+                                    return;
+
+                                FirebaseDatabase.getInstance()
+                                        .getReference("Users")
+                                        .child(user.getUid())
+                                        .child("profileImage")
+                                        .setValue(imageUrl);
+
+                                runOnUiThread(() -> {
+
+                                    Glide.with(
+                                                    ProfileActivity.this
+                                            )
+                                            .load(imageUrl)
+                                            .into(profileImage);
+
+                                    Toast.makeText(
+                                            ProfileActivity.this,
+                                            "Profile Updated",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                });
+
+                            } catch (Exception e) {
+
+                                e.printStackTrace();
+
+                                runOnUiThread(() ->
+                                        Toast.makeText(
+                                                ProfileActivity.this,
+                                                "JSON Error",
+                                                Toast.LENGTH_LONG
+                                        ).show()
+                                );
+                            }
+                        }
                     });
-        });
 
-        // 🔥 UPDATE PASSWORD
+        } catch (Exception e) {
 
-        updatePasswordBtn.setOnClickListener(v -> {
+            e.printStackTrace();
 
-            String newPassword =
-                    passwordEdit.getText()
-                            .toString()
-                            .trim();
-
-            if (newPassword.length() < 6) {
-
-                Toast.makeText(
-                        this,
-                        "Password too short",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return;
-            }
-
-            user.updatePassword(newPassword)
-                    .addOnSuccessListener(unused -> {
-
-                        Toast.makeText(
-                                this,
-                                "Password Updated",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    });
-        });
-
-        // 🔥 LOGOUT
-
-        logoutBtn.setOnClickListener(v -> {
-
-            auth.signOut();
-
-            startActivity(
-                    new Intent(
-                            this,
-                            LoginActivity.class
-                    )
-            );
-
-            finish();
-        });
-
-        // 🔥 DELETE ACCOUNT
-
-        deleteBtn.setOnClickListener(v -> {
-
-            db.child(uid).removeValue();
-
-            user.delete()
-                    .addOnSuccessListener(unused -> {
-
-                        Toast.makeText(
-                                this,
-                                "Account Deleted",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                        startActivity(
-                                new Intent(
-                                        this,
-                                        LoginActivity.class
-                                )
-                        );
-
-                        finish();
-                    });
-        });
+            Toast.makeText(
+                    this,
+                    "Image Error",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
     }
 }

@@ -8,7 +8,12 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
+import com.bumptech.glide.Glide;
+import de.hdodenhof.circleimageview.CircleImageView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    CircleImageView profileImage;
     TextView usernameText, emailText;
 
     LinearLayout checkUpdateBtn;
@@ -29,6 +35,8 @@ public class SettingsActivity extends AppCompatActivity {
     LinearLayout deleteBtn;
 
     Switch pushSwitch;
+
+    LinearLayout profileSettingsBtn;
 
     FirebaseAuth auth;
 
@@ -49,6 +57,12 @@ public class SettingsActivity extends AppCompatActivity {
         // =========================
         // FIND VIEW BY ID
         // =========================
+
+        profileImage =
+                findViewById(R.id.profileImage);
+
+        profileSettingsBtn =
+                findViewById(R.id.profileSettingsBtn);
 
         usernameText =
                 findViewById(R.id.usernameText);
@@ -87,6 +101,47 @@ public class SettingsActivity extends AppCompatActivity {
             usernameText.setText(username);
         }
 
+        String uid = auth.getUid();
+
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(uid)
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                User user =
+                                        snapshot.getValue(
+                                                User.class
+                                        );
+
+                                if (user == null)
+                                    return;
+
+                                Glide.with(
+                                                SettingsActivity.this
+                                        )
+                                        .load(user.profileImage)
+                                        .placeholder(
+                                                R.drawable.default_profile
+                                        )
+                                        .error(
+                                                R.drawable.default_profile
+                                        )
+                                        .into(profileImage);
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                            }
+                        });
         // =========================
         // LOGOUT
         // =========================
@@ -104,6 +159,21 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
 
             finishAffinity();
+        });
+
+        // =========================
+        // PROFILE SETTINGS
+        // =========================
+
+        profileSettingsBtn.setOnClickListener(v -> {
+
+            startActivity(
+                    new Intent(
+                            SettingsActivity.this,
+                            ProfileActivity.class
+                    )
+            );
+
         });
 
         // =========================
@@ -137,35 +207,28 @@ public class SettingsActivity extends AppCompatActivity {
 
             builder.setTitle("Delete Account");
 
-            builder.setMessage(
-                    "Are you sure?"
-            );
+            builder.setMessage("Are you sure?");
 
             builder.setPositiveButton(
                     "Delete",
                     (dialog, which) -> {
 
-                        String uid =
-                                auth.getUid();
-
-                        // DELETE FROM DATABASE
-
-                        FirebaseDatabase.getInstance()
-                                .getReference("Users")
-                                .child(uid)
-                                .removeValue();
-
-                        // DELETE AUTH ACCOUNT
-
                         if (auth.getCurrentUser() != null) {
+
+                            String deleteUid =
+                                    auth.getCurrentUser().getUid();
+
+                            FirebaseDatabase.getInstance()
+                                    .getReference("Users")
+                                    .child(deleteUid)
+                                    .removeValue();
 
                             auth.getCurrentUser()
                                     .delete()
-
                                     .addOnCompleteListener(task -> {
 
                                         Toast.makeText(
-                                                this,
+                                                SettingsActivity.this,
                                                 "Account deleted",
                                                 Toast.LENGTH_SHORT
                                         ).show();

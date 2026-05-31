@@ -5,11 +5,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import com.bumptech.glide.Glide;
+import de.hdodenhof.circleimageview.CircleImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.database.DatabaseReference;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +26,8 @@ public class ChatActivity extends AppCompatActivity {
     // =========================
     // VIEWS
     // =========================
+
+    CircleImageView profileImage;
 
     ImageView backBtn;
 
@@ -64,6 +68,9 @@ public class ChatActivity extends AppCompatActivity {
         // FIND VIEWS
         // =========================
 
+        profileImage =
+                findViewById(R.id.profileImage);
+
         backBtn =
                 findViewById(R.id.backBtn);
 
@@ -97,15 +104,16 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
-        // =========================
-        // ONLINE STATUS
-        // =========================
+        DatabaseReference statusRef =
+                FirebaseDatabase.getInstance()
+                        .getReference("Users")
+                        .child(currentUid)
+                        .child("status");
 
-        FirebaseDatabase.getInstance()
-                .getReference("Users")
-                .child(currentUid)
-                .child("status")
-                .setValue("Online");
+        statusRef.setValue("Online");
+
+        statusRef.onDisconnect()
+                .setValue("Offline");
 
         // =========================
         // INTENT DATA
@@ -113,6 +121,46 @@ public class ChatActivity extends AppCompatActivity {
 
         receiverUid =
                 getIntent().getStringExtra("uid");
+
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(receiverUid)
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                User user =
+                                        snapshot.getValue(
+                                                User.class
+                                        );
+
+                                if (user == null)
+                                    return;
+
+                                Glide.with(
+                                                ChatActivity.this
+                                        )
+                                        .load(user.profileImage)
+                                        .placeholder(
+                                                R.drawable.default_profile
+                                        )
+                                        .error(
+                                                R.drawable.default_profile
+                                        )
+                                        .into(profileImage);
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                            }
+                        });
 
         if (receiverUid == null) {
 
@@ -174,7 +222,6 @@ public class ChatActivity extends AppCompatActivity {
                 .getReference("Users")
                 .child(receiverUid)
                 .child("status")
-
                 .addValueEventListener(
                         new ValueEventListener() {
 
@@ -188,16 +235,13 @@ public class ChatActivity extends AppCompatActivity {
                                                 String.class
                                         );
 
-                                if (status != null &&
-                                        !status.isEmpty()) {
+                                if ("Online".equals(status)) {
 
-                                    statusText.setText(status);
+                                    statusText.setText("🟢 Online");
 
                                 } else {
 
-                                    statusText.setText(
-                                            "Offline"
-                                    );
+                                    statusText.setText("⚫ Offline");
                                 }
                             }
 
@@ -322,9 +366,9 @@ public class ChatActivity extends AppCompatActivity {
     // =========================
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
 
-        super.onDestroy();
+        super.onPause();
 
         if (currentUid != null) {
 
@@ -333,6 +377,28 @@ public class ChatActivity extends AppCompatActivity {
                     .child(currentUid)
                     .child("status")
                     .setValue("Offline");
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("lastSeen")
+                    .setValue(System.currentTimeMillis());
         }
     }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        if (currentUid != null) {
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("status")
+                    .setValue("Online");
+        }
+    }
+
 }

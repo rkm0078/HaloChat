@@ -11,13 +11,11 @@
         android:layout_width="64dp"
         android:layout_height="64dp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImage"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/default_profile"
-            android:padding="14dp"
-            android:tint="#6E7B8B" />
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/default_profile"/>
 
         <View
             android:layout_width="12dp"

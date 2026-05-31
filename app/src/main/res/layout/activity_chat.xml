@@ -32,12 +32,23 @@
 
         <!-- PROFILE -->
 
+        <!-- PROFILE IMAGE -->
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/default_profile"/>
+
+        <!-- USER INFO -->
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            android:layout_marginStart="12dp">
 
             <TextView
                 android:id="@+id/username"
@@ -56,6 +67,7 @@
                 android:textColor="#9A9A9A"
                 android:textSize="11sp"
                 android:layout_marginTop="2dp"/>
+
         </LinearLayout>
 
         <!-- CALL -->

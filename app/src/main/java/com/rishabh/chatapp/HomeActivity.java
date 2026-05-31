@@ -72,8 +72,21 @@ public class HomeActivity extends AppCompatActivity {
         // =========================
 
         auth = FirebaseAuth.getInstance();
-
         currentUid = auth.getUid();
+
+        if (currentUid != null) {
+
+            DatabaseReference statusRef =
+                    FirebaseDatabase.getInstance()
+                            .getReference("Users")
+                            .child(currentUid)
+                            .child("status");
+
+            statusRef.setValue("Online");
+
+            statusRef.onDisconnect()
+                    .setValue("Offline");
+        }
 
         // =========================
         // ONLINE STATUS
@@ -317,10 +330,11 @@ public class HomeActivity extends AppCompatActivity {
     // OFFLINE STATUS
     // =========================
 
-    @Override
-    protected void onDestroy() {
 
-        super.onDestroy();
+    @Override
+    protected void onPause() {
+
+        super.onPause();
 
         if (currentUid != null) {
 
@@ -329,6 +343,27 @@ public class HomeActivity extends AppCompatActivity {
                     .child(currentUid)
                     .child("status")
                     .setValue("Offline");
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("lastSeen")
+                    .setValue(System.currentTimeMillis());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        if (currentUid != null) {
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("status")
+                    .setValue("Online");
         }
     }
 }

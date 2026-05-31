@@ -8,7 +8,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.bumptech.glide.Glide;
+import de.hdodenhof.circleimageview.CircleImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -86,6 +87,16 @@ public class FriendRequestAdapter
         holder.timeText.setText(
                 "Sends request"
         );
+
+        // =========================
+        // PROFILE IMAGE
+        // =========================
+
+        Glide.with(context)
+                .load(user.profileImage)
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .into(holder.profileImage);
 
         // =========================
         // ACCEPT BUTTON
@@ -217,7 +228,7 @@ public class FriendRequestAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        ImageView profileImage;
+        CircleImageView profileImage;
 
         TextView username;
 

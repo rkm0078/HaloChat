@@ -12,14 +12,11 @@
 
     <!-- PROFILE IMAGE -->
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profileImage"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:background="@drawable/circle_light"
-        android:padding="10dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/default_profile" />
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/default_profile"/>
 
     <!-- USER INFO -->
 

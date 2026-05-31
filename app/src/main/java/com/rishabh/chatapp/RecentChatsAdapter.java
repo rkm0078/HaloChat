@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import de.hdodenhof.circleimageview.CircleImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -67,20 +67,11 @@ public class RecentChatsAdapter
 
         // PROFILE IMAGE
 
-        if (user.profileImage != null &&
-                !user.profileImage.isEmpty() &&
-                !user.profileImage.equals("default")) {
-
-            Glide.with(context)
-                    .load(user.profileImage)
-                    .into(holder.profileImage);
-
-        } else {
-
-            holder.profileImage.setImageResource(
-                    R.drawable.default_profile
-            );
-        }
+        Glide.with(context)
+                .load(user.profileImage)
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .into(holder.profileImage);
 
         // CHAT ROOM
 
@@ -211,7 +202,7 @@ public class RecentChatsAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        ImageView profileImage;
+        CircleImageView profileImage;
 
         TextView username;
 

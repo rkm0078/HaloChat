@@ -71,13 +71,12 @@
                 android:layout_width="190dp"
                 android:layout_height="190dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profileImage"
-                    android:layout_width="190dp"
-                    android:layout_height="190dp"
-                    android:background="@drawable/default_profile"
-                    android:padding="18dp"
-                    android:tint="#55657A" />
+                    android:layout_width="170dp"
+                    android:layout_height="170dp"
+                    android:src="@drawable/default_profile"
+                    android:scaleType="centerCrop"/>
 
             </RelativeLayout>
 

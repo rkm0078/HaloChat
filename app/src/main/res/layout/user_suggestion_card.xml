@@ -19,12 +19,11 @@
         android:background="@drawable/circle_light_bg"
         android:gravity="center">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImage"
-            android:layout_width="68dp"
-            android:layout_height="68dp"
-            android:src="@drawable/default_profile"
-            android:scaleType="centerCrop"/>
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/default_profile"/>
 
     </LinearLayout>
 
