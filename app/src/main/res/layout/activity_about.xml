@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F5F6">
+
+    <!-- BACK BUTTON -->
+
+    <ImageView
+        android:id="@+id/backBtn"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="28dp"
+        android:src="@drawable/back_icon"
+        android:tint="#5B6675" />
+
+    <!-- MAIN CONTENT -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="34dp"
+        android:paddingEnd="34dp">
+
+        <!-- LOGO -->
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/logo_icon"
+            android:tint="#6B7788" />
+
+        <!-- APP NAME -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="HaloChat"
+            android:textColor="#111111"
+            android:textSize="48sp"
+            android:textStyle="bold" />
+
+        <!-- DESCRIPTION -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:gravity="center"
+            android:lineSpacingExtra="8dp"
+            android:text="Empowering meaningful connections through a secure, intuitive, and modern messaging experience."
+            android:textColor="#555555"
+            android:textSize="20sp" />
+
+        <!-- VERSION -->
+
+        <LinearLayout
+            android:layout_width="210dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="42dp"
+            android:background="@drawable/light_round_bg"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.18"
+                android:text="VERSION 1.0.0"
+                android:textColor="#777777"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- MADE WITH LOVE CARD -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_above="@id/footerText"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="34dp"
+        android:background="@drawable/rounded_white"
+        android:elevation="2dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Made with "
+            android:textColor="#666666"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="❤"
+            android:textColor="#FF3B30"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" by "
+            android:textColor="#666666"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rishabh Mishra"
+            android:textColor="#4F5D73"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- FOOTER -->
+
+    <TextView
+        android:id="@+id/footerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="34dp"
+        android:letterSpacing="0.08"
+        android:text="© 2026 HALOCHAT ENGINE. ALL RIGHTS RESERVED."
+        android:textColor="#B9B9B9"
+        android:textSize="14sp" />
+
+</RelativeLayout>

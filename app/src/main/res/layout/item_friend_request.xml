@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="18dp"
+    android:background="@drawable/rounded_white"
+    android:elevation="2dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="18dp">
+
+    <!-- PROFILE IMAGE -->
+
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:background="@drawable/circle_light"
+        android:padding="10dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_profile" />
+
+    <!-- USER INFO -->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="Alex Rivera"
+            android:textColor="#111111"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/requestText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="Wants to be your friend"
+            android:textColor="#555555"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <!-- BUTTON SIDE -->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- ACCEPT -->
+
+        <Button
+            android:id="@+id/acceptBtn"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/button_bg"
+            android:text="Accept"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- DECLINE -->
+
+        <Button
+            android:id="@+id/declineBtn"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:background="@drawable/outline_button_bg"
+            android:text="Decline"
+            android:textAllCaps="false"
+            android:textColor="#111111"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

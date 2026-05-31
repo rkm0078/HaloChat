@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:layout_marginBottom="18dp"
+    android:background="#FFFFFF"
+    android:elevation="3dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!-- PROFILE -->
+
+    <FrameLayout
+        android:layout_width="68dp"
+        android:layout_height="68dp">
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_profile"/>
+
+        <!-- ONLINE DOT -->
+
+        <View
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/online_dot"/>
+    </FrameLayout>
+
+    <!-- MESSAGE SECTION -->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Julian Rossi"
+            android:textColor="#111111"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/lastMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Can we review the designs for..."
+            android:textColor="#333333"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- RIGHT SIDE -->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:45 PM"
+            android:textColor="#6C1BFF"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="12dp"
+            android:background="#6C1BFF"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/unreadCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
