@@ -70,6 +70,9 @@ public class SettingsActivity extends AppCompatActivity {
         emailText =
                 findViewById(R.id.emailText);
 
+        checkUpdateBtn =
+                findViewById(R.id.checkUpdateBtn);
+
         logoutBtn =
                 findViewById(R.id.logoutBtn);
 
@@ -298,16 +301,18 @@ public class SettingsActivity extends AppCompatActivity {
         // Check Update
         // =========================
 
-        checkUpdateBtn =
-                findViewById(R.id.checkUpdateBtn);
-
         checkUpdateBtn.setOnClickListener(v -> {
 
-            Toast.makeText(
-                    this,
-                    "HaloChat is up to date",
-                    Toast.LENGTH_SHORT
-            ).show();
+            String updateUrl =
+                    "https://github.com/rkm0078/HaloChat/releases/latest";
+
+            Intent intent =
+                    new Intent(
+                            Intent.ACTION_VIEW,
+                            android.net.Uri.parse(updateUrl)
+                    );
+
+            startActivity(intent);
         });
 
         backBtn =
