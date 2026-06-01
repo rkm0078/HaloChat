@@ -397,13 +397,13 @@ public class SettingsActivity extends AppCompatActivity {
                                                     " is available with improved performance and new features.\n\nWould you like to update now?"
                                     );
 
-                                    btnUpdate.setOnClickListener(v -> {
+                                    btnUpdate.setOnClickListener(v1 -> {
 
                                         downloadAndInstallApk(apkUrl);
                                         dialog.dismiss();
                                     });
 
-                                    btnLater.setOnClickListener(v ->
+                                    btnLater.setOnClickListener(v1 ->
                                             dialog.dismiss()
                                     );
 
@@ -471,6 +471,9 @@ public class SettingsActivity extends AppCompatActivity {
         );
 
         progressDialog.setMax(100);
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("0% Downloaded");
         progressDialog.show();
 
         OkHttpClient client =
@@ -497,21 +500,28 @@ public class SettingsActivity extends AppCompatActivity {
                                     Toast.LENGTH_LONG
                             ).show();
                         });
-                    } {
-
-                        runOnUiThread(() ->
-                                Toast.makeText(
-                                        SettingsActivity.this,
-                                        "Download Failed",
-                                        Toast.LENGTH_LONG
-                                ).show());
                     }
 
                     @Override
                     public void onResponse(
+
                             Call call,
                             Response response
                     ) throws IOException {
+
+                        if (!response.isSuccessful()) {
+
+                            runOnUiThread(() -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(
+                                        SettingsActivity.this,
+                                        "Server Error: " + response.code(),
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            });
+
+                            return;
+                        }
 
                         File apkFile =
                                 new File(
@@ -520,6 +530,28 @@ public class SettingsActivity extends AppCompatActivity {
                                         ),
                                         "HaloChat.apk"
                                 );
+                        if (apkFile.exists() && !apkFile.delete()) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(
+                                        SettingsActivity.this,
+                                        "Unable to replace old APK",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            });
+                            return;
+                        }
+
+                        if (response.body() == null) {
+                            runOnUiThread(() -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(
+                                        SettingsActivity.this,
+                                        "Empty server response",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            });
+                            return;
+                        }
 
                         InputStream input =
                                 response.body().byteStream();
@@ -528,10 +560,13 @@ public class SettingsActivity extends AppCompatActivity {
                                 new FileOutputStream(apkFile);
 
                         byte[] buffer =
-                                new byte[4096];
+                                new byte[8192];
 
-                        long total =
-                                response.body().contentLength();
+                        long total = response.body().contentLength();
+
+                        if (total <= 0) {
+                            total = 1;
+                        }
 
                         long downloaded = 0;
 
@@ -548,53 +583,107 @@ public class SettingsActivity extends AppCompatActivity {
                             );
 
                             int progress =
-                                    (int)
-                                            (downloaded * 100 / total);
+                                    (int) (downloaded * 100 / total);
 
-                            runOnUiThread(() ->
-                                    progressDialog.setProgress(
-                                            progress
-                                    ));
+                            runOnUiThread(() -> {
+
+                                progressDialog.setProgress(progress);
+
+                                progressDialog.setMessage(
+                                        progress + "% Downloaded"
+                                );
+                            });
                         }
 
-                        output.flush();
-                        output.close();
-                        input.close();
+                        try {
+                            output.flush();
+                        } finally {
+                            output.close();
+                            input.close();
+                        }
 
-                        progressDialog.dismiss();
+                        runOnUiThread(() -> {
 
-                        runOnUiThread(() ->
-                                installApk(apkFile));
+                            progressDialog.dismiss();
+
+                            Toast.makeText(
+                                    SettingsActivity.this,
+                                    "Download Complete",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                            if (apkFile.exists()) {
+                                installApk(apkFile);
+                            } else {
+                                Toast.makeText(
+                                        SettingsActivity.this,
+                                        "APK file not found",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            }
+                        });
                     }
                 });
     }
 
+
     private void installApk(File apkFile) {
 
-        Uri apkUri =
-                FileProvider.getUriForFile(
-                        this,
-                        getPackageName() + ".provider",
-                        apkFile
-                );
+        try {
 
-        Intent intent =
-                new Intent(Intent.ACTION_VIEW);
+            Toast.makeText(
+                    this,
+                    "Opening installer...",
+                    Toast.LENGTH_SHORT
+            ).show();
 
-        intent.setDataAndType(
-                apkUri,
-                "application/vnd.android.package-archive"
-        );
+            Uri apkUri =
+                    FileProvider.getUriForFile(
+                            this,
+                            getPackageName() + ".provider",
+                            apkFile
+                    );
 
-        intent.addFlags(
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-        );
+            Intent intent =
+                    new Intent(Intent.ACTION_VIEW);
 
-        intent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK
-        );
+            intent.setDataAndType(
+                    apkUri,
+                    "application/vnd.android.package-archive"
+            );
 
-        startActivity(intent);
+            intent.addFlags(
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+            );
+
+            intent.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+            );
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+                if (!getPackageManager().canRequestPackageInstalls()) {
+
+                    Intent settingsIntent =
+                            new Intent(
+                                    android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                    Uri.parse("package:" + getPackageName())
+                            );
+
+                    startActivity(settingsIntent);
+
+                    return;
+                }
+            }
+            startActivity(intent);
+
+        } catch (Exception e) {
+
+            Toast.makeText(
+                    this,
+                    "INSTALL ERROR:\n" + e.getMessage(),
+                    Toast.LENGTH_LONG
+            ).show();
+
+            e.printStackTrace();
+        }
     }
-
 }

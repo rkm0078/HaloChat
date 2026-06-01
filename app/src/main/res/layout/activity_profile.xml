@@ -72,6 +72,7 @@
                     app:civ_border_width="3dp"
                     app:civ_border_color="#E5E5E5" />
 
+
                 <LinearLayout
                     android:id="@+id/changePhotoBtn"
                     android:layout_width="58dp"
@@ -81,6 +82,13 @@
                     android:background="@drawable/dark_circle"
                     android:elevation="4dp"
                     android:gravity="center">
+
+                    <ProgressBar
+                        android:id="@+id/uploadProgress"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone"/>
 
                     <ImageView
                         android:layout_width="28dp"

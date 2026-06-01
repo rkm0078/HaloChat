@@ -1,16 +1,15 @@
 package com.rishabh.chatapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
-import android.widget.LinearLayout;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -19,6 +18,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -199,53 +211,74 @@ public class RegisterActivity extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(e, p)
 
                     .addOnSuccessListener(authResult -> {
+                        if (auth.getCurrentUser() == null) {
+
+                            progressBar.setVisibility(View.GONE);
+
+                            registerBtn.setEnabled(true);
+
+                            registerBtn.setText("Sign Up");
+
+                            return;
+                        }
 
                         String uid =
                                 auth.getCurrentUser()
                                         .getUid();
 
-                        User user =
-                                new User(
-                                        uid,
-                                        f,
-                                        l,
-                                        u,
-                                        e,
-                                        selectedImageUri == null
-                                                ? "default"
-                                                : selectedImageUri.toString(),
-                                        "Online",
-                                        "",
-                                        0
-                                );
+                        if (selectedImageUri != null) {
 
-                        db.child(uid)
-                                .setValue(user)
+                            uploadToCloudinaryAndRegister(
+                                    selectedImageUri,
+                                    uid,
+                                    f,
+                                    l,
+                                    u,
+                                    e
+                            );
 
-                                .addOnSuccessListener(unused -> {
+                        } else {
 
-                                    progressBar.setVisibility(View.GONE);
+                            User user =
+                                    new User(
+                                            uid,
+                                            f,
+                                            l,
+                                            u,
+                                            e,
+                                            "default",
+                                            "Online",
+                                            "",
+                                            0
+                                    );
 
-                                    registerBtn.setEnabled(true);
+                            db.child(uid)
+                                    .setValue(user)
+                                    .addOnSuccessListener(unused -> {
 
-                                    registerBtn.setText("Sign Up");
+                                        progressBar.setVisibility(View.GONE);
 
-                                    Toast.makeText(
-                                            this,
-                                            "Registration Successful",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
+                                        registerBtn.setEnabled(true);
 
-                                    Intent intent =
-                                            new Intent(
-                                                    RegisterActivity.this,
-                                                    HomeActivity.class
-                                            );
+                                        registerBtn.setText("Sign Up");
 
-                                    startActivity(intent);
+                                        Toast.makeText(
+                                                RegisterActivity.this,
+                                                "Registration Successful",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
 
-                                    finish();
-                                });
+                                        startActivity(
+                                                new Intent(
+                                                        RegisterActivity.this,
+                                                        HomeActivity.class
+                                                )
+                                        );
+
+                                        finish();
+                                    });
+                        }
+
                     })
 
                     .addOnFailureListener(err -> {
@@ -256,26 +289,11 @@ public class RegisterActivity extends AppCompatActivity {
 
                         registerBtn.setText("Sign Up");
 
-                        String message =
-                                err.getMessage();
-
-                        if (message != null
-                                && message.contains("already")) {
-
-                            Toast.makeText(
-                                    this,
-                                    "Email already exists",
-                                    Toast.LENGTH_LONG
-                            ).show();
-
-                        } else {
-
-                            Toast.makeText(
-                                    this,
-                                    message,
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
+                        Toast.makeText(
+                                RegisterActivity.this,
+                                err.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show();
                     });
         });
 
@@ -295,5 +313,170 @@ public class RegisterActivity extends AppCompatActivity {
 
             finish();
         });
+    }
+
+    private void uploadToCloudinaryAndRegister(
+            Uri imageUri,
+            String uid,
+            String f,
+            String l,
+            String u,
+            String e
+    ) {
+
+        String cloudName = "domvygmqx";
+        String uploadPreset = "halochat_profiles";
+
+        try {
+
+            byte[] imageBytes =
+                    getContentResolver()
+                            .openInputStream(imageUri)
+                            .readAllBytes();
+
+            RequestBody requestBody =
+                    new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart(
+                                    "file",
+                                    "profile.jpg",
+                                    RequestBody.create(imageBytes)
+                            )
+                            .addFormDataPart(
+                                    "upload_preset",
+                                    uploadPreset
+                            )
+                            .build();
+
+            Request request =
+                    new Request.Builder()
+                            .url(
+                                    "https://api.cloudinary.com/v1_1/"
+                                            + cloudName
+                                            + "/image/upload"
+                            )
+                            .post(requestBody)
+                            .build();
+
+            new OkHttpClient()
+                    .newCall(request)
+                    .enqueue(new Callback() {
+
+                        @Override
+                        public void onFailure(
+                                Call call,
+                                IOException ex
+                        ) {
+
+                            runOnUiThread(() -> {
+
+                                progressBar.setVisibility(View.GONE);
+
+                                registerBtn.setEnabled(true);
+
+                                registerBtn.setText("Sign Up");
+
+                                Toast.makeText(
+                                        RegisterActivity.this,
+                                        "Image Upload Failed",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            });
+                        }
+
+                        @Override
+                        public void onResponse(
+                                Call call,
+                                Response response
+                        ) throws IOException {
+
+                            try {
+
+                                JSONObject object =
+                                        new JSONObject(
+                                                response.body().string()
+                                        );
+
+                                String imageUrl =
+                                        object.getString(
+                                                "secure_url"
+                                        );
+
+                                User user =
+                                        new User(
+                                                uid,
+                                                f,
+                                                l,
+                                                u,
+                                                e,
+                                                imageUrl,
+                                                "Online",
+                                                "",
+                                                0
+                                        );
+
+                                db.child(uid)
+                                        .setValue(user)
+                                        .addOnSuccessListener(unused -> {
+
+                                            runOnUiThread(() -> {
+
+                                                progressBar.setVisibility(View.GONE);
+
+                                                registerBtn.setEnabled(true);
+
+                                                registerBtn.setText("Sign Up");
+
+                                                Toast.makeText(
+                                                        RegisterActivity.this,
+                                                        "Registration Successful",
+                                                        Toast.LENGTH_SHORT
+                                                ).show();
+
+                                                startActivity(
+                                                        new Intent(
+                                                                RegisterActivity.this,
+                                                                HomeActivity.class
+                                                        )
+                                                );
+
+                                                finish();
+                                            });
+                                        });
+
+                            } catch (Exception ex) {
+
+                                runOnUiThread(() -> {
+
+                                    progressBar.setVisibility(View.GONE);
+
+                                    registerBtn.setEnabled(true);
+
+                                    registerBtn.setText("Sign Up");
+
+                                    Toast.makeText(
+                                            RegisterActivity.this,
+                                            ex.getMessage(),
+                                            Toast.LENGTH_LONG
+                                    ).show();
+                                });
+                            }
+                        }
+                    });
+
+        } catch (Exception ex) {
+
+            progressBar.setVisibility(View.GONE);
+
+            registerBtn.setEnabled(true);
+
+            registerBtn.setText("Sign Up");
+
+            Toast.makeText(
+                    this,
+                    ex.getMessage(),
+                    Toast.LENGTH_LONG
+            ).show();
+        }
     }
 }

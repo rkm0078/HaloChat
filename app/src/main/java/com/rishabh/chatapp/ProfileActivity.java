@@ -4,7 +4,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import android.view.View;
+import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -35,7 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 101;
     ImageView backBtn;
     ImageView profileImage;
-
+    ProgressBar uploadProgress;
     LinearLayout changePhotoBtn;
 
     TextView fullName;
@@ -83,6 +84,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         profileImage =
                 findViewById(R.id.profileImage);
+
+        uploadProgress =
+                findViewById(R.id.uploadProgress);
 
         changePhotoBtn =
                 findViewById(R.id.changePhotoBtn);
@@ -186,9 +190,13 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void uploadToCloudinary(Uri imageUri) {
 
+        uploadProgress.setVisibility(View.VISIBLE);
+        changePhotoBtn.setAlpha(0.6f);
+        changePhotoBtn.setEnabled(false);
+
         Toast.makeText(
                 this,
-                "Uploading...",
+                "Uploading profile photo...",
                 Toast.LENGTH_SHORT
         ).show();
 
@@ -238,13 +246,18 @@ public class ProfileActivity extends AppCompatActivity {
                                 IOException e
                         ) {
 
-                            runOnUiThread(() ->
-                                    Toast.makeText(
-                                            ProfileActivity.this,
-                                            "Upload Failed",
-                                            Toast.LENGTH_LONG
-                                    ).show()
-                            );
+                            runOnUiThread(() -> {
+
+                                uploadProgress.setVisibility(View.GONE);
+                                changePhotoBtn.setAlpha(1f);
+                                changePhotoBtn.setEnabled(true);
+
+                                Toast.makeText(
+                                        ProfileActivity.this,
+                                        "Upload Failed. Check internet connection.",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            });
                         }
 
                         @Override
@@ -271,8 +284,17 @@ public class ProfileActivity extends AppCompatActivity {
                                                 .getInstance()
                                                 .getCurrentUser();
 
-                                if (user == null)
+                                if (user == null) {
+
+                                    runOnUiThread(() -> {
+
+                                        uploadProgress.setVisibility(View.GONE);
+                                        changePhotoBtn.setAlpha(1f);
+                                        changePhotoBtn.setEnabled(true);
+                                    });
+
                                     return;
+                                }
 
                                 FirebaseDatabase.getInstance()
                                         .getReference("Users")
@@ -282,11 +304,14 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 runOnUiThread(() -> {
 
-                                    Glide.with(
-                                                    ProfileActivity.this
-                                            )
+                                    uploadProgress.setVisibility(View.GONE);
+                                    changePhotoBtn.setAlpha(1f);
+
+                                    Glide.with(ProfileActivity.this)
                                             .load(imageUrl)
                                             .into(profileImage);
+
+                                    changePhotoBtn.setEnabled(true);
 
                                     Toast.makeText(
                                             ProfileActivity.this,
@@ -299,13 +324,18 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 e.printStackTrace();
 
-                                runOnUiThread(() ->
-                                        Toast.makeText(
-                                                ProfileActivity.this,
-                                                "JSON Error",
-                                                Toast.LENGTH_LONG
-                                        ).show()
-                                );
+                                runOnUiThread(() -> {
+
+                                    uploadProgress.setVisibility(View.GONE);
+                                    changePhotoBtn.setAlpha(1f);
+                                    changePhotoBtn.setEnabled(true);
+
+                                    Toast.makeText(
+                                            ProfileActivity.this,
+                                            "JSON Error",
+                                            Toast.LENGTH_LONG
+                                    ).show();
+                                });
                             }
                         }
                     });
@@ -313,7 +343,9 @@ public class ProfileActivity extends AppCompatActivity {
         } catch (Exception e) {
 
             e.printStackTrace();
-
+            uploadProgress.setVisibility(View.GONE);
+            changePhotoBtn.setAlpha(1f);
+            changePhotoBtn.setEnabled(true);
             Toast.makeText(
                     this,
                     "Image Error",

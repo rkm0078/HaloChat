@@ -1,5 +1,4 @@
 package com.rishabh.chatapp;
-
 public class User {
 
     // =========================

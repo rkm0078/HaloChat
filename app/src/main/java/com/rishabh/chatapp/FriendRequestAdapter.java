@@ -93,7 +93,7 @@ public class FriendRequestAdapter
         // =========================
 
         Glide.with(context)
-                .load(user.profileImage)
+                .load(user.getSafeProfileImage())
                 .placeholder(R.drawable.default_profile)
                 .error(R.drawable.default_profile)
                 .into(holder.profileImage);

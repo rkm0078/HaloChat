@@ -46,8 +46,14 @@ public class FriendRequestsActivity
         String currentUid =
                 FirebaseAuth.getInstance().getUid();
 
+        if (currentUid == null) {
+            finish();
+            return;
+        }
+
         db = FirebaseDatabase.getInstance()
-                .getReference("FriendRequests");
+                .getReference("FriendRequests")
+                .child(currentUid);
 
         db.addValueEventListener(new ValueEventListener() {
 
@@ -57,46 +63,40 @@ public class FriendRequestsActivity
 
                 requests.clear();
 
-                for (DataSnapshot data :
-                        snapshot.getChildren()) {
+                for (DataSnapshot data : snapshot.getChildren()) {
 
-                    String to =
-                            data.child("to")
-                                    .getValue(String.class);
+                    String senderUid = data.getKey();
 
-                    String from =
-                            data.child("from")
-                                    .getValue(String.class);
+                    if (senderUid == null)
+                        continue;
 
-                    if (to != null &&
-                            to.equals(currentUid)) {
+                    FirebaseDatabase.getInstance()
+                            .getReference("Users")
+                            .child(senderUid)
+                            .addListenerForSingleValueEvent(
+                                    new ValueEventListener() {
 
-                        FirebaseDatabase.getInstance()
-                                .getReference("Users")
-                                .child(from)
-                                .addListenerForSingleValueEvent(
-                                        new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(
+                                                @NonNull DataSnapshot snapshot) {
 
-                                            @Override
-                                            public void onDataChange(
-                                                    @NonNull DataSnapshot snapshot) {
+                                            User user =
+                                                    snapshot.getValue(User.class);
 
-                                                User user =
-                                                        snapshot.getValue(User.class);
+                                            if (user != null) {
 
-                                                if (user != null) {
-                                                    requests.add(user);
-                                                    adapter.notifyDataSetChanged();
-                                                }
+                                                requests.add(user);
+
+                                                adapter.notifyDataSetChanged();
                                             }
+                                        }
 
-                                            @Override
-                                            public void onCancelled(
-                                                    @NonNull DatabaseError error) {
+                                        @Override
+                                        public void onCancelled(
+                                                @NonNull DatabaseError error) {
 
-                                            }
-                                        });
-                    }
+                                        }
+                                    });
                 }
             }
 
