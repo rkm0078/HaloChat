@@ -6,6 +6,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginActivity extends AppCompatActivity {
 
     EditText email, password;
+
+    ImageView passwordToggle;
+
+    TextView forgotPassword;
 
     Button loginBtn;
 
@@ -36,6 +43,12 @@ public class LoginActivity extends AppCompatActivity {
         password =
                 findViewById(R.id.password);
 
+        passwordToggle =
+                findViewById(R.id.passwordToggle);
+
+        forgotPassword =
+                findViewById(R.id.forgotPassword);
+
         loginBtn =
                 findViewById(R.id.loginBtn);
 
@@ -44,6 +57,53 @@ public class LoginActivity extends AppCompatActivity {
 
         auth =
                 FirebaseAuth.getInstance();
+
+        // PASSWORD TOGGLE
+
+        final boolean[] passwordVisible = {false};
+
+        passwordToggle.setOnClickListener(v -> {
+
+            if (passwordVisible[0]) {
+
+                password.setTransformationMethod(
+                        PasswordTransformationMethod.getInstance()
+                );
+
+                passwordToggle.setImageResource(
+                        R.drawable.ic_eye
+                );
+
+            } else {
+
+                password.setTransformationMethod(
+                        HideReturnsTransformationMethod.getInstance()
+                );
+
+                passwordToggle.setImageResource(
+                        R.drawable.ic_eye_off
+                );
+            }
+
+            passwordVisible[0] =
+                    !passwordVisible[0];
+
+            password.setSelection(
+                    password.getText().length()
+            );
+        });
+
+        // FORGOT PASSWORD
+
+        forgotPassword.setOnClickListener(v -> {
+
+            startActivity(
+                    new Intent(
+                            LoginActivity.this,
+                            ForgotPasswordActivity.class
+                    )
+            );
+        });
 
         // LOGIN BUTTON
 
@@ -80,24 +140,48 @@ public class LoginActivity extends AppCompatActivity {
 
                     .addOnSuccessListener(authResult -> {
 
-                        loginBtn.setEnabled(true);
+                        authResult.getUser()
+                                .reload()
+                                .addOnSuccessListener(unused -> {
 
-                        loginBtn.setText("Log In");
+                                    if (!authResult.getUser()
+                                            .isEmailVerified()) {
 
-                        Toast.makeText(
-                                this,
-                                "Login Successful",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                                        FirebaseAuth.getInstance()
+                                                .signOut();
 
-                        startActivity(
-                                new Intent(
-                                        LoginActivity.this,
-                                        HomeActivity.class
-                                )
-                        );
+                                        loginBtn.setEnabled(true);
 
-                        finish();
+                                        loginBtn.setText("Log In");
+
+                                        Toast.makeText(
+                                                LoginActivity.this,
+                                                "Please verify your email first. Check Inbox or Spam folder.",
+                                                Toast.LENGTH_LONG
+                                        ).show();
+
+                                        return;
+                                    }
+
+                                    loginBtn.setEnabled(true);
+
+                                    loginBtn.setText("Log In");
+
+                                    Toast.makeText(
+                                            LoginActivity.this,
+                                            "Login Successful",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+
+                                    startActivity(
+                                            new Intent(
+                                                    LoginActivity.this,
+                                                    HomeActivity.class
+                                            )
+                                    );
+
+                                    finish();
+                                });
                     })
 
                     .addOnFailureListener(err -> {
@@ -132,19 +216,32 @@ public class LoginActivity extends AppCompatActivity {
 
         super.onStart();
 
-        // AUTO LOGIN
-
         if (FirebaseAuth.getInstance()
                 .getCurrentUser() != null) {
 
-            startActivity(
-                    new Intent(
-                            LoginActivity.this,
-                            HomeActivity.class
-                    )
-            );
+            FirebaseAuth.getInstance()
+                    .getCurrentUser()
+                    .reload()
+                    .addOnSuccessListener(unused -> {
 
-            finish();
+                        if (FirebaseAuth.getInstance()
+                                .getCurrentUser()
+                                .isEmailVerified()) {
+
+                            startActivity(
+                                    new Intent(
+                                            LoginActivity.this,
+                                            HomeActivity.class
+                                    )
+                            );
+
+                            finish();
+                        } else {
+
+                            FirebaseAuth.getInstance()
+                                    .signOut();
+                        }
+                    });
         }
     }
 }

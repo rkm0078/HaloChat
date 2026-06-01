@@ -10,11 +10,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.google.firebase.auth.FirebaseUser;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.widget.ImageView;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -45,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText username;
     EditText email;
     EditText password;
+    ImageView passwordToggle;
 
     Button registerBtn;
 
@@ -105,6 +108,9 @@ public class RegisterActivity extends AppCompatActivity {
         password =
                 findViewById(R.id.password);
 
+        passwordToggle =
+                findViewById(R.id.passwordToggle);
+
         registerBtn =
                 findViewById(R.id.registerBtn);
 
@@ -138,6 +144,42 @@ public class RegisterActivity extends AppCompatActivity {
         db =
                 FirebaseDatabase.getInstance()
                         .getReference("Users");
+
+        // =========================
+        // PASSWORD TOGGLE
+        // =========================
+
+        final boolean[] passwordVisible = {false};
+
+        passwordToggle.setOnClickListener(v -> {
+
+            if (passwordVisible[0]) {
+
+                password.setTransformationMethod(
+                        PasswordTransformationMethod.getInstance()
+                );
+
+                passwordToggle.setImageResource(
+                        R.drawable.ic_eye
+                );
+
+            } else {
+
+                password.setTransformationMethod(
+                        HideReturnsTransformationMethod.getInstance()
+                );
+
+                passwordToggle.setImageResource(
+                        R.drawable.ic_eye_off
+                );
+            }
+
+            passwordVisible[0] = !passwordVisible[0];
+
+            password.setSelection(
+                    password.getText().length()
+            );
+        });
 
         // =========================
         // REGISTER BUTTON
@@ -256,26 +298,54 @@ public class RegisterActivity extends AppCompatActivity {
                                     .setValue(user)
                                     .addOnSuccessListener(unused -> {
 
-                                        progressBar.setVisibility(View.GONE);
+                                        FirebaseUser firebaseUser =
+                                                FirebaseAuth.getInstance()
+                                                        .getCurrentUser();
 
-                                        registerBtn.setEnabled(true);
+                                        if (firebaseUser != null) {
 
-                                        registerBtn.setText("Sign Up");
+                                            firebaseUser.sendEmailVerification()
+                                                    .addOnSuccessListener(task -> {
 
-                                        Toast.makeText(
-                                                RegisterActivity.this,
-                                                "Registration Successful",
-                                                Toast.LENGTH_SHORT
-                                        ).show();
+                                                        progressBar.setVisibility(View.GONE);
 
-                                        startActivity(
-                                                new Intent(
-                                                        RegisterActivity.this,
-                                                        HomeActivity.class
-                                                )
-                                        );
+                                                        registerBtn.setEnabled(true);
 
-                                        finish();
+                                                        registerBtn.setText("Sign Up");
+
+                                                        Toast.makeText(
+                                                                RegisterActivity.this,
+                                                                "Verification email sent.Please check Inbox or Spam folder.",
+                                                                Toast.LENGTH_LONG
+                                                        ).show();
+
+                                                        FirebaseAuth.getInstance()
+                                                                .signOut();
+
+                                                        startActivity(
+                                                                new Intent(
+                                                                        RegisterActivity.this,
+                                                                        LoginActivity.class
+                                                                )
+                                                        );
+
+                                                        finish();
+                                                    })
+                                                    .addOnFailureListener(error -> {
+
+                                                        progressBar.setVisibility(View.GONE);
+
+                                                        registerBtn.setEnabled(true);
+
+                                                        registerBtn.setText("Sign Up");
+
+                                                        Toast.makeText(
+                                                                RegisterActivity.this,
+                                                                error.getMessage(),
+                                                                Toast.LENGTH_LONG
+                                                        ).show();
+                                                    });
+                                        }
                                     });
                         }
 
@@ -419,29 +489,60 @@ public class RegisterActivity extends AppCompatActivity {
                                         .setValue(user)
                                         .addOnSuccessListener(unused -> {
 
-                                            runOnUiThread(() -> {
+                                            FirebaseUser firebaseUser =
+                                                    FirebaseAuth.getInstance()
+                                                            .getCurrentUser();
 
-                                                progressBar.setVisibility(View.GONE);
+                                            if (firebaseUser != null) {
 
-                                                registerBtn.setEnabled(true);
+                                                firebaseUser.sendEmailVerification()
+                                                        .addOnSuccessListener(unused2 -> {
 
-                                                registerBtn.setText("Sign Up");
+                                                            runOnUiThread(() -> {
 
-                                                Toast.makeText(
-                                                        RegisterActivity.this,
-                                                        "Registration Successful",
-                                                        Toast.LENGTH_SHORT
-                                                ).show();
+                                                                progressBar.setVisibility(View.GONE);
 
-                                                startActivity(
-                                                        new Intent(
-                                                                RegisterActivity.this,
-                                                                HomeActivity.class
-                                                        )
-                                                );
+                                                                registerBtn.setEnabled(true);
 
-                                                finish();
-                                            });
+                                                                registerBtn.setText("Sign Up");
+
+                                                                Toast.makeText(
+                                                                        RegisterActivity.this,
+                                                                        "Verification email sent.\nPlease check Inbox or Spam folder.",
+                                                                        Toast.LENGTH_LONG
+                                                                ).show();
+
+                                                                FirebaseAuth.getInstance()
+                                                                        .signOut();
+
+                                                                startActivity(
+                                                                        new Intent(
+                                                                                RegisterActivity.this,
+                                                                                LoginActivity.class
+                                                                        )
+                                                                );
+
+                                                                finish();
+                                                            });
+                                                        })
+                                                        .addOnFailureListener(error -> {
+
+                                                            runOnUiThread(() -> {
+
+                                                                progressBar.setVisibility(View.GONE);
+
+                                                                registerBtn.setEnabled(true);
+
+                                                                registerBtn.setText("Sign Up");
+
+                                                                Toast.makeText(
+                                                                        RegisterActivity.this,
+                                                                        error.getMessage(),
+                                                                        Toast.LENGTH_LONG
+                                                                ).show();
+                                                            });
+                                                        });
+                                            }
                                         });
 
                             } catch (Exception ex) {
