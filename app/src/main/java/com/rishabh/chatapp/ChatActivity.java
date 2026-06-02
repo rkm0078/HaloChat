@@ -57,6 +57,8 @@ public class ChatActivity extends AppCompatActivity {
     String senderRoom;
     String receiverRoom;
 
+    private boolean isChatOpen = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -221,7 +223,6 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance()
                 .getReference("Users")
                 .child(receiverUid)
-                .child("status")
                 .addValueEventListener(
                         new ValueEventListener() {
 
@@ -230,67 +231,23 @@ public class ChatActivity extends AppCompatActivity {
                                     @NonNull DataSnapshot snapshot
                             ) {
 
-                                String status =
+                                User user =
                                         snapshot.getValue(
-                                                String.class
+                                                User.class
                                         );
 
-                                if ("Online".equals(status)) {
+                                if (user == null) return;
 
-                                    statusText.setText("🟢 Online");
+                                if ("Online".equals(user.status)) {
+
+                                    statusText.setText(
+                                            "Active now"
+                                    );
 
                                 } else {
 
-                                    statusText.setText("⚫ Offline");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(
-                                    @NonNull DatabaseError error
-                            ) {
-
-                            }
-                        });
-
-        // =========================
-        // LOAD MESSAGES
-        // =========================
-
-        FirebaseDatabase.getInstance()
-                .getReference("Chats")
-                .child(senderRoom)
-
-                .addValueEventListener(
-                        new ValueEventListener() {
-
-                            @Override
-                            public void onDataChange(
-                                    @NonNull DataSnapshot snapshot
-                            ) {
-
-                                messages.clear();
-
-                                for (DataSnapshot data :
-                                        snapshot.getChildren()) {
-
-                                    Message message =
-                                            data.getValue(
-                                                    Message.class
-                                            );
-
-                                    if (message != null) {
-
-                                        messages.add(message);
-                                    }
-                                }
-
-                                adapter.notifyDataSetChanged();
-
-                                if (messages.size() > 0) {
-
-                                    chatList.scrollToPosition(
-                                            messages.size() - 1
+                                    statusText.setText(
+                                            "Last seen recently"
                                     );
                                 }
                             }
@@ -299,9 +256,80 @@ public class ChatActivity extends AppCompatActivity {
                             public void onCancelled(
                                     @NonNull DatabaseError error
                             ) {
-
                             }
                         });
+
+        // =========================
+        // LOAD MESSAGES
+        // =========================
+
+        DatabaseReference senderRef =
+                FirebaseDatabase.getInstance()
+                        .getReference("Chats")
+                        .child(senderRoom);
+
+        DatabaseReference receiverRef =
+                FirebaseDatabase.getInstance()
+                        .getReference("Chats")
+                        .child(receiverRoom);
+
+        senderRef.addValueEventListener(
+                new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(
+                            @NonNull DataSnapshot snapshot
+                    ) {
+
+                        messages.clear();
+
+                        for (DataSnapshot snap :
+                                snapshot.getChildren()) {
+
+                            Message message =
+                                    snap.getValue(
+                                            Message.class
+                                    );
+
+                            if (message != null) {
+
+                                messages.add(message);
+
+                                if (isChatOpen &&
+                                        !message.senderId.equals(
+                                                FirebaseAuth.getInstance()
+                                                        .getCurrentUser()
+                                                        .getUid()
+                                        )) {
+
+                                    snap.getRef()
+                                            .child("seen")
+                                            .setValue(true);
+
+                                    snap.getRef()
+                                            .child("seenTime")
+                                            .setValue(System.currentTimeMillis());
+                                }
+                            }
+                        }
+
+                        adapter.notifyDataSetChanged();
+
+                        if (messages.size() > 0) {
+
+                            chatList.scrollToPosition(
+                                    messages.size() - 1
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(
+                            @NonNull DatabaseError error
+                    ) {
+
+                    }
+                });
 
         // =========================
         // SEND MESSAGE
@@ -337,7 +365,21 @@ public class ChatActivity extends AppCompatActivity {
                     .push()
                     .setValue(message);
 
-            // LAST MESSAGE
+            // LAST MESSAGE FOR CURRENT USER
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("lastMessage")
+                    .setValue(text);
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("lastMessageTime")
+                    .setValue(System.currentTimeMillis());
+
+            // LAST MESSAGE FOR RECEIVER
 
             FirebaseDatabase.getInstance()
                     .getReference("Users")
@@ -352,6 +394,35 @@ public class ChatActivity extends AppCompatActivity {
                     .setValue(System.currentTimeMillis());
 
             messageBox.setText("");
+
+            FirebaseDatabase.getInstance()
+                    .getReference("ChatList")
+                    .child(currentUid)
+                    .child(receiverUid)
+                    .child("lastMessage")
+                    .setValue(text);
+
+            FirebaseDatabase.getInstance()
+                    .getReference("ChatList")
+                    .child(currentUid)
+                    .child(receiverUid)
+                    .child("lastMessageTime")
+                    .setValue(System.currentTimeMillis());
+
+            FirebaseDatabase.getInstance()
+                    .getReference("ChatList")
+                    .child(receiverUid)
+                    .child(currentUid)
+                    .child("lastMessage")
+                    .setValue(text);
+
+            FirebaseDatabase.getInstance()
+                    .getReference("ChatList")
+                    .child(receiverUid)
+                    .child(currentUid)
+                    .child("lastMessageTime")
+                    .setValue(System.currentTimeMillis());
+
         });
 
         // =========================
@@ -366,9 +437,29 @@ public class ChatActivity extends AppCompatActivity {
     // =========================
 
     @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        isChatOpen = true;
+
+        if (currentUid != null) {
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .child("status")
+                    .setValue("Online");
+        }
+    }
+
+
+    @Override
     protected void onPause() {
 
         super.onPause();
+
+        isChatOpen = false;
 
         if (currentUid != null) {
 
@@ -383,21 +474,6 @@ public class ChatActivity extends AppCompatActivity {
                     .child(currentUid)
                     .child("lastSeen")
                     .setValue(System.currentTimeMillis());
-        }
-    }
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-
-        if (currentUid != null) {
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Users")
-                    .child(currentUid)
-                    .child("status")
-                    .setValue("Online");
         }
     }
 

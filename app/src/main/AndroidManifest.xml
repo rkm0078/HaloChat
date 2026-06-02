@@ -31,6 +31,8 @@
         <activity android:name=".NewChatActivity"/>
         <activity android:name=".AboutActivity"/>
         <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".ChangePasswordActivity" />
+        <activity android:name=".DeleteAccountActivity" />
 
 
         <activity

@@ -11,8 +11,8 @@ android {
         applicationId = "com.rishabh.chatapp"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "2.2"
+        versionCode = 6
+        versionName = "2.2.2"
     }
 
     buildTypes {
@@ -55,4 +55,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.android.material:material:1.12.0")
 }

@@ -4,46 +4,46 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="end"
-    android:paddingLeft="12dp"
-    android:paddingRight="12dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
         android:orientation="vertical"
         android:gravity="end">
 
-        <LinearLayout
+        <!-- MESSAGE BUBBLE -->
+
+        <TextView
+            android:id="@+id/senderMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_bg"
-            android:backgroundTint="#6C7B8B"
-            android:paddingLeft="14dp"
-            android:paddingRight="14dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:background="@drawable/sender_message_bg"
+            android:maxWidth="260dp"
+            android:padding="14dp"
+            android:text="Hello"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/senderMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="sdsdsd"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"/>
+        <!-- TIME -->
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/seenStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#94A3B8"/>
 
         <TextView
             android:id="@+id/senderTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="11:39 AM"
-            android:textColor="#9E9E9E"
-            android:textSize="10sp"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"/>
+            android:layout_marginTop="3dp"
+            android:text="09:45 AM"
+            android:textColor="#9A9A9A"
+            android:textSize="10sp" />
 
     </LinearLayout>
 

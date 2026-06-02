@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.firebase.auth.FirebaseAuth;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,13 +42,18 @@ public class MessageAdapter
 
         Message message = messages.get(position);
 
-        if (message.senderId.equals(receiverUid)) {
+        String currentUid =
+                FirebaseAuth.getInstance()
+                        .getCurrentUser()
+                        .getUid();
 
-            return ITEM_RECEIVE;
+        if (message.senderId.equals(currentUid)) {
+
+            return ITEM_SENT;
 
         } else {
 
-            return ITEM_SENT;
+            return ITEM_RECEIVE;
         }
     }
 
@@ -103,23 +108,50 @@ public class MessageAdapter
 
         if (holder instanceof SenderViewHolder) {
 
-            ((SenderViewHolder) holder)
-                    .senderMessage
-                    .setText(message.message);
+            SenderViewHolder senderHolder =
+                    (SenderViewHolder) holder;
 
-            ((SenderViewHolder) holder)
-                    .senderTime
-                    .setText(time);
+            senderHolder.senderMessage.setText(
+                    message.message
+            );
+
+            senderHolder.senderTime.setText(
+                    time
+            );
+
+            if (message.seen) {
+
+                String seenTime =
+                        new SimpleDateFormat(
+                                "hh:mm a",
+                                Locale.getDefault()
+                        ).format(
+                                new Date(message.seenTime)
+                        );
+
+                senderHolder.seenStatus.setText(
+                        "Seen " + seenTime
+                );
+
+            } else {
+
+                senderHolder.seenStatus.setText(
+                        "Sent " + time
+                );
+            }
 
         } else {
 
-            ((ReceiverViewHolder) holder)
-                    .receiverMessage
-                    .setText(message.message);
+            ReceiverViewHolder receiverHolder =
+                    (ReceiverViewHolder) holder;
 
-            ((ReceiverViewHolder) holder)
-                    .receiverTime
-                    .setText(time);
+            receiverHolder.receiverMessage.setText(
+                    message.message
+            );
+
+            receiverHolder.receiverTime.setText(
+                    time
+            );
         }
     }
 
@@ -138,12 +170,14 @@ public class MessageAdapter
 
         TextView senderMessage;
         TextView senderTime;
+        TextView seenStatus;
 
         public SenderViewHolder(
                 @NonNull View itemView
         ) {
 
             super(itemView);
+
 
             senderMessage =
                     itemView.findViewById(
@@ -153,6 +187,11 @@ public class MessageAdapter
             senderTime =
                     itemView.findViewById(
                             R.id.senderTime
+                    );
+
+            seenStatus =
+                    itemView.findViewById(
+                            R.id.seenStatus
                     );
         }
     }

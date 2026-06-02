@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import de.hdodenhof.circleimageview.CircleImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class FrequentAdapter
         View view =
                 LayoutInflater.from(context)
                         .inflate(
-                                R.layout.item_frequent_user,
+                                R.layout.item_chat,
                                 parent,
                                 false
                         );
@@ -60,14 +62,43 @@ public class FrequentAdapter
 
         // SAFE USERNAME
 
-        if (user.username != null &&
-                !user.username.isEmpty()) {
+        if (user.getFullName() != null &&
+                !user.getFullName().isEmpty()) {
 
-            holder.username.setText(user.username);
+            holder.userName.setText(
+                    user.getFullName()
+            );
 
         } else {
 
-            holder.username.setText("User");
+            holder.userName.setText("User");
+        }
+
+        if (user.lastMessage != null) {
+
+            holder.lastMessage.setText(
+                    user.lastMessage
+            );
+
+        } else {
+
+            holder.lastMessage.setText("");
+        }
+
+        if (user.lastMessageTime > 0) {
+
+            holder.timeText.setText(
+                    new SimpleDateFormat(
+                            "hh:mm a",
+                            Locale.getDefault()
+                    ).format(
+                            new Date(user.lastMessageTime)
+                    )
+            );
+
+        } else {
+
+            holder.timeText.setText("");
         }
 
         // SAFE IMAGE
@@ -84,6 +115,32 @@ public class FrequentAdapter
 
             holder.profileImage.setImageResource(
                     R.drawable.default_profile
+            );
+        }
+
+        // UNREAD COUNT
+
+        System.out.println(
+                "ADAPTER -> "
+                        + user.getFullName()
+                        + " unread = "
+                        + user.unreadCount
+        );
+
+        if (user.unreadCount > 0) {
+
+            holder.unreadCount.setVisibility(
+                    View.VISIBLE
+            );
+
+            holder.unreadCount.setText(
+                    String.valueOf(user.unreadCount)
+            );
+
+        } else {
+
+            holder.unreadCount.setVisibility(
+                    View.GONE
             );
         }
 
@@ -115,9 +172,7 @@ public class FrequentAdapter
 
             intent.putExtra(
                     "username",
-                    user.username == null
-                            ? "User"
-                            : user.username
+                    user.getFullName()
             );
 
             context.startActivity(intent);
@@ -133,9 +188,12 @@ public class FrequentAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        ImageView profileImage;
+        CircleImageView profileImage;
 
-        TextView username;
+        TextView userName;
+        TextView lastMessage;
+        TextView timeText;
+        TextView unreadCount;
 
         public ViewHolder(
                 @NonNull View itemView
@@ -148,9 +206,24 @@ public class FrequentAdapter
                             R.id.profileImage
                     );
 
-            username =
+            userName =
                     itemView.findViewById(
-                            R.id.username
+                            R.id.userName
+                    );
+
+            lastMessage =
+                    itemView.findViewById(
+                            R.id.lastMessage
+                    );
+
+            timeText =
+                    itemView.findViewById(
+                            R.id.timeText
+                    );
+
+            unreadCount =
+                    itemView.findViewById(
+                            R.id.unreadCount
                     );
         }
     }

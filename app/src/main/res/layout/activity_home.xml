@@ -1,186 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#F8F8F8"
+    android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <!-- TOP BAR -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <!-- LOGO -->
-
-                <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:src="@drawable/logo_icon"
-                    android:tint="#6B7280" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text="HaloChat"
-                    android:textColor="#4B5563"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
-
-                <!-- ADD FRIEND -->
-
-                <ImageView
-                    android:id="@+id/addFriendBtn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="18dp"
-                    android:src="@drawable/add_friend_icon"
-                    android:tint="#666666" />
-
-                <!-- SETTINGS -->
-
-                <ImageView
-                    android:id="@+id/settingsBtn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/settings_icon"
-                    android:tint="#666666" />
-
-            </LinearLayout>
-
-            <!-- SEARCH -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="28dp"
-                android:background="@drawable/rounded_white"
-                android:gravity="center_vertical"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/search_icon"
-                    android:tint="#8B8B8B" />
-
-                <EditText
-                    android:id="@+id/searchBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Search chats..."
-                    android:textColor="#111111"
-                    android:textColorHint="#888888"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <!-- CHATS TITLE -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="36dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Chats"
-                    android:textColor="#111111"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mark all as read"
-                    android:textColor="#666666"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- CHAT LIST -->
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerUsers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:nestedScrollingEnabled="false" />
-
-            <!-- BOTTOM ICON -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:layout_marginTop="50dp"
-                android:layout_marginBottom="40dp">
-
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:src="@drawable/logo_icon"
-                    android:tint="#B5B5B5" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="End of messages"
-                    android:textColor="#AAAAAA"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- FLOAT BUTTON -->
+    <!-- TOP BAR -->
 
     <LinearLayout
-        android:id="@+id/fabBtn"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="22dp"
-        android:layout_marginBottom="22dp"
-        android:background="@drawable/button_bg"
-        android:elevation="8dp"
-        android:gravity="center">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="20dp">
 
         <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/logo_icon"
+            android:tint="#55657A" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="HaloChat"
+            android:textColor="#22324A"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/addFriendBtn"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/edit_icon"
-            android:tint="#FFFFFF" />
+            android:layout_marginEnd="18dp"
+            android:src="@drawable/add_friend_icon"
+            android:tint="#94A3B8" />
+
+        <ImageView
+            android:id="@+id/settingsBtn"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/rounded_bg"
+            android:padding="10dp"
+            android:src="@drawable/settings_icon"
+            android:tint="#94A3B8" />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <!-- SEARCH -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:elevation="2dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/edittext_bg"
+        android:gravity="center_vertical"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/search_icon"
+            android:tint="#94A3B8" />
+
+        <EditText
+            android:id="@+id/searchBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="@android:color/transparent"
+            android:hint="Search chats or friends..."
+            android:textColor="#222222"
+            android:textColorHint="#94A3B8"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <!-- TABS -->
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:padding="4dp"
+        android:background="@drawable/rounded_big"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="#FFFFFF"
+        app:tabIndicatorHeight="0dp"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabSelectedTextColor="#22324A"
+        app:tabTextColor="#94A3B8">
+
+        <com.google.android.material.tabs.TabItem
+            android:text="Chats" />
+
+        <com.google.android.material.tabs.TabItem
+            android:text="Friends" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- TITLE ROW -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="RECENT ACTIVITY"
+            android:textColor="#94A3B8"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/markReadBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MARK ALL READ"
+            android:textColor="#94A3B8"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- CHAT LIST -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerUsers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp" />
+
+    <!-- BOTTOM INDICATOR -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="42dp"
+            android:layout_height="2dp"
+            android:background="#D9DDE3" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/circle_dot" />
+
+        <View
+            android:layout_width="42dp"
+            android:layout_height="2dp"
+            android:background="#D9DDE3" />
+
+    </LinearLayout>
+
+</LinearLayout>

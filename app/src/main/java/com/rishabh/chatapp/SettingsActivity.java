@@ -207,18 +207,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         changePasswordBtn.setOnClickListener(v -> {
 
-            if (auth.getCurrentUser() != null) {
-
-                auth.sendPasswordResetEmail(
-                        auth.getCurrentUser().getEmail()
-                );
-
-                Toast.makeText(
-                        this,
-                        "Password reset email sent",
-                        Toast.LENGTH_LONG
-                ).show();
-            }
+            startActivity(
+                    new Intent(
+                            SettingsActivity.this,
+                            ChangePasswordActivity.class
+                    )
+            );
         });
 
         // =========================
@@ -227,58 +221,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         deleteBtn.setOnClickListener(v -> {
 
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(this);
-
-            builder.setTitle("Delete Account");
-
-            builder.setMessage("Are you sure?");
-
-            builder.setPositiveButton(
-                    "Delete",
-                    (dialog, which) -> {
-
-                        if (auth.getCurrentUser() != null) {
-
-                            String deleteUid =
-                                    auth.getCurrentUser().getUid();
-
-                            FirebaseDatabase.getInstance()
-                                    .getReference("Users")
-                                    .child(deleteUid)
-                                    .removeValue();
-
-                            auth.getCurrentUser()
-                                    .delete()
-                                    .addOnCompleteListener(task -> {
-
-                                        Toast.makeText(
-                                                SettingsActivity.this,
-                                                "Account deleted",
-                                                Toast.LENGTH_SHORT
-                                        ).show();
-
-                                        Intent intent =
-                                                new Intent(
-                                                        SettingsActivity.this,
-                                                        RegisterActivity.class
-                                                );
-
-                                        startActivity(intent);
-
-                                        finishAffinity();
-                                    });
-                        }
-                    });
-
-            builder.setNegativeButton(
-                    "Cancel",
-                    null
+            startActivity(
+                    new Intent(
+                            SettingsActivity.this,
+                            DeleteAccountActivity.class
+                    )
             );
 
-            builder.show();
         });
-
         // =========================
         // PUSH SWITCH
         // =========================

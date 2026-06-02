@@ -33,9 +33,13 @@ public class User {
     // CHAT INFO
     // =========================
 
+    public int unreadCount = 0;
+
     public String lastMessage = "";
 
     public long lastMessageTime = 0;
+
+    public String bio = "";
 
     // =========================
     // EMPTY CONSTRUCTOR
@@ -58,7 +62,8 @@ public class User {
             String profileImage,
             String status,
             String lastMessage,
-            long lastMessageTime
+            long lastMessageTime,
+            String bio
     ) {
 
         this.uid = uid;
@@ -88,7 +93,14 @@ public class User {
 
         this.lastMessageTime =
                 lastMessageTime;
+
+        this.bio =
+                bio != null
+                        ? bio
+                        : "";
+
     }
+
 
     // =========================
     // FULL NAME

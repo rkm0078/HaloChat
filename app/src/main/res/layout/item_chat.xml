@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <!-- PROFILE IMAGE -->
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profileImage"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:src="@drawable/default_profile" />
+
+
+    <!-- USERNAME -->
+
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/profileImage"
+        android:layout_marginStart="18dp"
+        android:text="RKM"
+        android:textColor="#1F2D3D"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- TIME -->
+
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="NOW"
+        android:textColor="#94A3B8"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <!-- LAST MESSAGE -->
+
+    <TextView
+        android:id="@+id/lastMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userName"
+        android:layout_toEndOf="@id/profileImage"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="6dp"
+        android:layout_toStartOf="@id/timeText"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="Hey, just checking in on the project..."
+        android:textColor="#7B8A9A"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/unreadCount"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/timeText"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/circle_badge"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
+
+</RelativeLayout>

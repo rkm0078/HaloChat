@@ -33,21 +33,19 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="55dp"
-                android:text="Profile"
+                android:text="Profile Settings"
                 android:textColor="#111111"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/editBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/saveBtn"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:text="Edit"
-                android:textColor="#5B6878"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:src="@drawable/save_icon"
+                android:tint="#5B6878"/>
 
         </RelativeLayout>
 
@@ -64,13 +62,25 @@
                 android:layout_height="170dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/changePhotoBtn"
+                    android:id="@+id/profileImage"
                     android:layout_width="170dp"
                     android:layout_height="170dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/default_profile"
-                    app:civ_border_color="#D0D0D0"
-                    app:civ_border_width="2dp" />
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="#E5E7EB" />
+
+                <ImageView
+                    android:id="@+id/changePhotoBtn"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/circle_camera_bg"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_camera"
+                    android:tint="#FFFFFF" />
 
                 <ProgressBar
                     android:id="@+id/uploadProgress"
@@ -79,68 +89,17 @@
                     android:layout_centerInParent="true"
                     android:visibility="gone"/>
 
-
             </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Click To Change Profile Photo"
+                android:text="PROFILE PHOTO"
+                android:letterSpacing="0.15"
                 android:textColor="#555555"
-                android:textSize="16sp"/>
+                android:textSize="12sp"/>
 
-            <!-- NAME -->
-
-            <TextView
-                android:id="@+id/fullName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Rishabh Mishra"
-                android:textColor="#111111"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <!-- USERNAME -->
-
-            <TextView
-                android:id="@+id/username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@rishabhtest"
-                android:textColor="#555555"
-                android:textSize="18sp" />
-
-            <!-- SHARE BUTTON -->
-
-            <LinearLayout
-                android:id="@+id/shareBtn"
-                android:layout_width="280dp"
-                android:layout_height="64dp"
-                android:layout_marginTop="26dp"
-                android:background="@drawable/dark_round_bg"
-                android:elevation="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/share_icon"
-                    android:tint="#FFFFFF" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="Share Profile"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
@@ -167,116 +126,81 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.08"
-                    android:text="PERSONAL DETAILS"
+                    android:text="Personal Info"
                     android:textColor="#3F3F3F"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/editDetailsBtn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:src="@drawable/edit_icon"
-                    android:tint="#666666" />
-
             </RelativeLayout>
 
-            <!-- USERNAME -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Display Name"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
+
+            <EditText
+                android:id="@+id/nameEdit"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/light_round_bg"
+                android:padding="16dp"
+                android:text="Rishabh Mishra"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Username"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="34dp"
-                android:orientation="horizontal">
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/light_round_bg"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
 
-                <LinearLayout
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/light_round_bg"
-                    android:gravity="center">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/username_icon"
+                    android:tint="#7B8A9A" />
 
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:src="@drawable/username_icon"
-                        android:tint="#666666" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/usernameEdit"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Username"
-                        android:textColor="#444444"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/usernameDetail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="@rishabhtest"
-                        android:textColor="#111111"
-                        android:textSize="20sp" />
-
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Username"
+                    android:textColor="#111111"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
-            <!-- FULL NAME -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Bio"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/bioEdit"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/light_round_bg"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:src="@drawable/person_icon"
-                        android:tint="#666666" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Full Name"
-                        android:textColor="#444444"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/fullNameDetail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Rishabh Mishra"
-                        android:textColor="#111111"
-                        android:textSize="20sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
+                android:layout_height="120dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/light_round_bg"
+                android:gravity="top"
+                android:padding="16dp"/>
 
         </LinearLayout>
 
@@ -304,7 +228,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.08"
-                    android:text="ACCOUNT SETTINGS"
+                    android:text="Account"
                     android:textColor="#3F3F3F"
                     android:textSize="18sp"
                     android:textStyle="bold" />

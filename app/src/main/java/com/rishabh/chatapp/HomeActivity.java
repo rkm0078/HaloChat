@@ -2,44 +2,42 @@ package com.rishabh.chatapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-
+import android.widget.TextView;
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.Collections;
+import com.google.firebase.database.*;
+import android.text.Editable;
+import android.text.TextWatcher;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.google.android.material.tabs.TabLayout;
 
 public class HomeActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-
-    ArrayList<User> users;
-
-    RecentChatsAdapter adapter;
-
-    FirebaseAuth auth;
+    ImageView addFriendBtn, settingsBtn;
 
     EditText searchBar;
 
-    LinearLayout fabBtn;
+    TextView titleText;
+    TextView markReadBtn;
 
-    ImageView addFriendBtn;
-    ImageView settingsBtn;
+    RecyclerView recyclerUsers;
 
-    String currentUid;
+    TabLayout tabLayout;
+    HashMap<String, Integer> unreadMap =
+            new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,86 +46,124 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
-        // =========================
-        // FIND VIEWS
-        // =========================
-
-        recyclerView =
-                findViewById(R.id.recyclerUsers);
-
         addFriendBtn =
                 findViewById(R.id.addFriendBtn);
-
-        searchBar =
-                findViewById(R.id.searchBar);
-
-        fabBtn =
-                findViewById(R.id.fabBtn);
 
         settingsBtn =
                 findViewById(R.id.settingsBtn);
 
-        // =========================
-        // FIREBASE
-        // =========================
+        searchBar =
+                findViewById(R.id.searchBar);
 
-        auth = FirebaseAuth.getInstance();
-        currentUid = auth.getUid();
+        titleText =
+                findViewById(R.id.titleText);
 
-        if (currentUid != null) {
 
-            DatabaseReference statusRef =
-                    FirebaseDatabase.getInstance()
-                            .getReference("Users")
-                            .child(currentUid)
-                            .child("status");
+        markReadBtn =
+                findViewById(R.id.markReadBtn);
 
-            statusRef.setValue("Online");
+        recyclerUsers =
+                findViewById(R.id.recyclerUsers);
 
-            statusRef.onDisconnect()
-                    .setValue("Offline");
-        }
+        tabLayout =
+                findViewById(R.id.tabLayout);
 
-        // =========================
-        // ONLINE STATUS
-        // =========================
+        tabLayout.removeAllTabs();
 
-        if (currentUid != null) {
+        tabLayout.addTab(
+                tabLayout.newTab().setText("Chats")
+        );
 
-            FirebaseDatabase.getInstance()
-                    .getReference("Users")
-                    .child(currentUid)
-                    .child("status")
-                    .setValue("Online");
-        }
+        tabLayout.addTab(
+                tabLayout.newTab().setText("Friends")
+        );
 
-        // =========================
-        // USER LIST
-        // =========================
-
-        users = new ArrayList<>();
-
-        adapter =
-                new RecentChatsAdapter(
-                        this,
-                        users
-                );
-
-        recyclerView.setLayoutManager(
+        recyclerUsers.setLayoutManager(
                 new LinearLayoutManager(this)
         );
 
-        recyclerView.setAdapter(adapter);
+        // ADD FRIEND
 
-        // =========================
-        // LOAD FRIENDS
-        // =========================
+        addFriendBtn.setOnClickListener(v ->
 
-        loadFriends();
+                startActivity(
+                        new Intent(
+                                HomeActivity.this,
+                                AddFriendsActivity.class
+                        )
+                )
+        );
 
-        // =========================
-        // SEARCH
-        // =========================
+        // SETTINGS
+
+        settingsBtn.setOnClickListener(v ->
+
+                startActivity(
+                        new Intent(
+                                HomeActivity.this,
+                                SettingsActivity.class
+                        )
+                )
+        );
+
+        // TABS
+
+        tabLayout.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+
+                    @Override
+                    public void onTabSelected(
+                            @NonNull TabLayout.Tab tab) {
+
+                        if (tab.getPosition() == 0) {
+
+                            // Chats Tab
+                            loadChats();
+
+                        } else {
+
+                            // Friends Tab
+                            loadFriends();
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(
+                            @NonNull TabLayout.Tab tab) {
+                    }
+
+                    @Override
+                    public void onTabReselected(
+                            @NonNull TabLayout.Tab tab) {
+                    }
+                }
+        );
+
+        // DEFAULT TAB
+
+        loadChats();
+    }
+
+    private void loadChats() {
+
+        titleText.setText(
+                "RECENT ACTIVITY"
+        );
+
+        markReadBtn.setVisibility(
+                View.VISIBLE
+        );
+
+        ArrayList<User> chatList =
+                new ArrayList<>();
+
+        FrequentAdapter adapter =
+                new FrequentAdapter(
+                        HomeActivity.this,
+                        chatList
+                );
+
+        recyclerUsers.setAdapter(adapter);
 
         searchBar.addTextChangedListener(
                 new TextWatcher() {
@@ -139,7 +175,6 @@ public class HomeActivity extends AppCompatActivity {
                             int count,
                             int after
                     ) {
-
                     }
 
                     @Override
@@ -150,8 +185,10 @@ public class HomeActivity extends AppCompatActivity {
                             int count
                     ) {
 
-                        filterUsers(
-                                s.toString()
+                        filterChats(
+                                s.toString(),
+                                chatList,
+                                adapter
                         );
                     }
 
@@ -159,211 +196,244 @@ public class HomeActivity extends AppCompatActivity {
                     public void afterTextChanged(
                             Editable s
                     ) {
-
                     }
                 });
 
-        // =========================
-        // ADD FRIENDS
-        // =========================
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
 
-        addFriendBtn.setOnClickListener(v -> {
+                .addValueEventListener(
+                        new ValueEventListener() {
 
-            Intent intent =
-                    new Intent(
-                            HomeActivity.this,
-                            AddFriendsActivity.class
-                    );
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
 
-            startActivity(intent);
-        });
+                                chatList.clear();
 
-        // =========================
-        // SETTINGS
-        // =========================
+                                String currentUid =
+                                        FirebaseAuth.getInstance()
+                                                .getCurrentUser()
+                                                .getUid();
 
-        settingsBtn.setOnClickListener(v -> {
+                                for (DataSnapshot snap :
+                                        snapshot.getChildren()) {
 
-            Intent intent =
-                    new Intent(
-                            HomeActivity.this,
-                            SettingsActivity.class
-                    );
+                                    User user =
+                                            snap.getValue(
+                                                    User.class
+                                            );
+                                    String friendUid = snap.getKey();
 
-            startActivity(intent);
-        });
+                                    String room = currentUid + friendUid;
 
-        // =========================
-        // NEW CHAT
-        // =========================
+                                    if (user != null &&
+                                            !snap.getKey().equals(currentUid) &&
+                                            user.lastMessage != null &&
+                                            !user.lastMessage.isEmpty()) {
+                                        FirebaseDatabase.getInstance()
+                                                .getReference("Chats")
+                                                .child(room)
+                                                .addValueEventListener(
+                                                        new ValueEventListener() {
 
-        fabBtn.setOnClickListener(v -> {
+                                                            @Override
+                                                            public void onDataChange(
+                                                                    @NonNull DataSnapshot chatSnapshot
+                                                            ) {
 
-            Intent intent =
-                    new Intent(
-                            HomeActivity.this,
-                            NewChatActivity.class
-                    );
+                                                                int unread = 0;
 
-            startActivity(intent);
-        });
+                                                                for (DataSnapshot msgSnap :
+                                                                        chatSnapshot.getChildren()) {
+
+                                                                    Message msg =
+                                                                            msgSnap.getValue(
+                                                                                    Message.class
+                                                                            );
+
+                                                                    if (msg != null &&
+                                                                            msg.senderId != null &&
+                                                                            !msg.seen &&
+                                                                            !msg.senderId.equals(currentUid)) {
+
+                                                                        unread++;
+                                                                    }
+                                                                }
+
+                                                                user.unreadCount = unread;
+
+                                                                unreadMap.put(
+                                                                        user.uid,
+                                                                        unread
+                                                                );
+                                                                System.out.println(
+                                                                        user.getFullName()
+                                                                                + " unread = "
+                                                                                + unread
+                                                                );
+
+                                                                adapter.notifyDataSetChanged();
+                                                                Collections.sort(
+                                                                        chatList,
+                                                                        (u1, u2) ->
+                                                                                Long.compare(
+                                                                                        u2.lastMessageTime,
+                                                                                        u1.lastMessageTime
+                                                                                )
+                                                                );
+
+                                                                adapter.notifyDataSetChanged();
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(
+                                                                    @NonNull DatabaseError error
+                                                            ) {
+                                                            }
+                                                        });
+                                        if (unreadMap.containsKey(user.uid)) {
+
+                                            user.unreadCount =
+                                                    unreadMap.get(user.uid);
+                                        }
+                                        chatList.add(user);
+                                    }
+                                }
+
+                                Collections.sort(
+                                        chatList,
+                                        (u1, u2) ->
+                                                Long.compare(
+                                                        u2.lastMessageTime,
+                                                        u1.lastMessageTime
+                                                )
+                                );
+
+                                adapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+                            }
+                        });
     }
-
-    // =========================
-    // LOAD FRIENDS
-    // =========================
 
     private void loadFriends() {
 
-        if (currentUid == null)
-            return;
+        titleText.setText(
+                "ALL FRIENDS"
+        );
 
-        DatabaseReference friendsRef =
-                FirebaseDatabase.getInstance()
-                        .getReference("Friends")
-                        .child(currentUid);
+        markReadBtn.setVisibility(
+                View.GONE
+        );
 
-        friendsRef.addValueEventListener(
-                new ValueEventListener() {
+        String currentUid =
+                FirebaseAuth.getInstance()
+                        .getCurrentUser()
+                        .getUid();
 
-                    @Override
-                    public void onDataChange(
-                            @NonNull DataSnapshot snapshot
-                    ) {
+        ArrayList<User> friendsList =
+                new ArrayList<>();
 
-                        users.clear();
+        FriendAdapter adapter =
+                new FriendAdapter(friendsList);
 
-                        for (DataSnapshot data :
-                                snapshot.getChildren()) {
+        recyclerUsers.setAdapter(adapter);
 
-                            String friendUid =
-                                    data.getKey();
+        FirebaseDatabase.getInstance()
+                .getReference("Friends")
+                .child(currentUid)
 
-                            if (friendUid == null ||
-                                    friendUid.isEmpty()) {
+                .addValueEventListener(
+                        new ValueEventListener() {
 
-                                continue;
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                friendsList.clear();
+
+                                for (DataSnapshot friend :
+                                        snapshot.getChildren()) {
+
+                                    String friendUid =
+                                            friend.getKey();
+
+                                    FirebaseDatabase
+                                            .getInstance()
+                                            .getReference("Users")
+                                            .child(friendUid)
+
+                                            .addListenerForSingleValueEvent(
+                                                    new ValueEventListener() {
+
+                                                        @Override
+                                                        public void onDataChange(
+                                                                @NonNull DataSnapshot snap
+                                                        ) {
+
+                                                            User user =
+                                                                    snap.getValue(
+                                                                            User.class
+                                                                    );
+
+                                                            if (user != null) {
+
+                                                                friendsList.add(user);
+
+                                                                adapter.notifyDataSetChanged();
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(
+                                                                @NonNull DatabaseError error
+                                                        ) {
+                                                        }
+                                                    });
+                                }
                             }
 
-                            FirebaseDatabase.getInstance()
-                                    .getReference("Users")
-                                    .child(friendUid)
-
-                                    .addListenerForSingleValueEvent(
-                                            new ValueEventListener() {
-
-                                                @Override
-                                                public void onDataChange(
-                                                        @NonNull DataSnapshot snapshot
-                                                ) {
-
-                                                    User user =
-                                                            snapshot.getValue(
-                                                                    User.class
-                                                            );
-
-                                                    if (user == null)
-                                                        return;
-
-                                                    // IMPORTANT FIX
-
-                                                    user.uid =
-                                                            friendUid;
-
-                                                    users.add(user);
-
-                                                    adapter.notifyDataSetChanged();
-                                                }
-
-                                                @Override
-                                                public void onCancelled(
-                                                        @NonNull DatabaseError error
-                                                ) {
-
-                                                }
-                                            });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(
-                            @NonNull DatabaseError error
-                    ) {
-
-                    }
-                });
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+                            }
+                        });
     }
 
-    // =========================
-    // FILTER USERS
-    // =========================
-
-    private void filterUsers(String text) {
+    private void filterChats(
+            String text,
+            ArrayList<User> originalList,
+            FrequentAdapter adapter
+    ) {
 
         ArrayList<User> filtered =
                 new ArrayList<>();
 
-        for (User user : users) {
+        for (User user : originalList) {
 
-            String username =
-                    user.username != null
-                            ? user.username
-                            : "";
-
-            if (username.toLowerCase()
-                    .contains(text.toLowerCase())) {
+            if (user.getFullName()
+                    .toLowerCase()
+                    .contains(
+                            text.toLowerCase()
+                    )) {
 
                 filtered.add(user);
             }
         }
 
-        adapter =
-                new RecentChatsAdapter(
-                        this,
+        recyclerUsers.setAdapter(
+                new FrequentAdapter(
+                        HomeActivity.this,
                         filtered
-                );
-
-        recyclerView.setAdapter(adapter);
-    }
-
-    // =========================
-    // OFFLINE STATUS
-    // =========================
-
-
-    @Override
-    protected void onPause() {
-
-        super.onPause();
-
-        if (currentUid != null) {
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Users")
-                    .child(currentUid)
-                    .child("status")
-                    .setValue("Offline");
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Users")
-                    .child(currentUid)
-                    .child("lastSeen")
-                    .setValue(System.currentTimeMillis());
-        }
-    }
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-
-        if (currentUid != null) {
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Users")
-                    .child(currentUid)
-                    .child("status")
-                    .setValue("Online");
-        }
+                )
+        );
     }
 }

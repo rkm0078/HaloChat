@@ -1,27 +1,35 @@
 package com.rishabh.chatapp;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
+
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.*;
-import android.net.Uri;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import android.widget.Toast;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MultipartBody;
@@ -35,17 +43,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 101;
     ImageView backBtn;
-    ImageView profileImage;
+    CircleImageView profileImage;
     ProgressBar uploadProgress;
-    LinearLayout changePhotoBtn;
-
-    TextView fullName;
-    TextView username;
-
-    TextView fullNameDetail;
-    TextView usernameDetail;
-
+   ImageView changePhotoBtn;
     TextView emailText;
+    EditText nameEdit;
+    EditText usernameEdit;
+    EditText bioEdit;
+
+    ImageView saveBtn;
 
     FirebaseAuth auth;
     DatabaseReference db;
@@ -91,20 +97,21 @@ public class ProfileActivity extends AppCompatActivity {
         changePhotoBtn =
                 findViewById(R.id.changePhotoBtn);
 
-        fullName =
-                findViewById(R.id.fullName);
+        nameEdit =
+                findViewById(R.id.nameEdit);
 
-        username =
-                findViewById(R.id.username);
+        usernameEdit =
+                findViewById(R.id.usernameEdit);
 
-        fullNameDetail =
-                findViewById(R.id.fullNameDetail);
+        bioEdit =
+                findViewById(R.id.bioEdit);
 
-        usernameDetail =
-                findViewById(R.id.usernameDetail);
 
         emailText =
                 findViewById(R.id.emailText);
+
+        saveBtn =
+                findViewById(R.id.saveBtn);
 
         auth = FirebaseAuth.getInstance();
 
@@ -143,21 +150,18 @@ public class ProfileActivity extends AppCompatActivity {
                                 String name =
                                         user.getFullName();
 
-                                fullName.setText(name);
+                                nameEdit.setText(user.getFullName());
 
-                                fullNameDetail.setText(name);
+                                usernameEdit.setText(user.username);
 
-                                username.setText(
-                                        user.username
-                                );
+                                bioEdit.setText(user.bio);
 
-                                usernameDetail.setText(
-                                        user.username
-                                );
+                                if (user.bio != null) {
 
-                                emailText.setText(
-                                        user.email
-                                );
+                                    bioEdit.setText(
+                                            user.bio
+                                    );
+                                }
 
                                 Glide.with(ProfileActivity.this)
                                         .load(user.profileImage)
@@ -175,6 +179,41 @@ public class ProfileActivity extends AppCompatActivity {
                         });
 
         backBtn.setOnClickListener(v -> finish());
+
+        saveBtn.setOnClickListener(v -> {
+
+            Toast.makeText(
+                    this,
+                    "Profile Saved",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            HashMap<String,Object> updates =
+                    new HashMap<>();
+
+            updates.put(
+                    "firstName",
+                    nameEdit.getText().toString()
+            );
+
+            updates.put(
+                    "username",
+                    usernameEdit.getText().toString()
+            );
+
+            updates.put(
+                    "bio",
+                    bioEdit.getText().toString()
+            );
+            String currentUid =
+                    FirebaseAuth.getInstance()
+                            .getCurrentUser()
+                            .getUid();
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(currentUid)
+                    .updateChildren(updates);
+        });
 
         changePhotoBtn.setOnClickListener(v -> {
 

@@ -55,18 +55,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Alex Sterling"
-                android:textColor="#5A6472"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:textColor="#22324A"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/statusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Last seen 11:38 AM"
-                android:textColor="#9A9A9A"
-                android:textSize="11sp"
-                android:layout_marginTop="2dp"/>
+                android:text="Active now"
+                android:textColor="#8A8A8A"
+                android:textSize="12sp"/>
 
         </LinearLayout>
 
@@ -93,69 +92,106 @@
     <!-- ========================= -->
     <!-- CHAT LIST -->
     <!-- ========================= -->
-
-    <!-- ========================= -->
-    <!-- BOTTOM BAR -->
-    <!-- ========================= -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
         android:layout_above="@id/bottomBar"
-        android:layout_below="@id/topBar"/>
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="16dp"
+        android:clipToPadding="false"/>
+    <!-- ========================= -->
+    <!-- BOTTOM BAR -->
+    <!-- ========================= -->
 
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="14dp"
-        android:orientation="horizontal"
+        android:background="#F6F6F8"
         android:gravity="center_vertical"
-        android:background="#F6F6F8">
+        android:padding="12dp">
+
+        <!-- ATTACH -->
+
+        <ImageView
+            android:id="@+id/attachBtn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/add_icon"
+            android:tint="#5A6472" />
+
+        <!-- INPUT AREA -->
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/chat_input_bg">
+
+            <EditText
+                android:id="@+id/messageBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/emojiBtn"
+                android:background="@android:color/transparent"
+                android:hint="Message"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="#333333"
+                android:textColorHint="#8E8E8E"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:id="@+id/emojiBtn"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/emoji_icon"
+                android:tint="#5A6472" />
+
+        </RelativeLayout>
 
         <!-- MIC -->
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/micBtn"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/mic_icon"
-            android:tint="#7C8798"/>
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/circle_dark_bg"
+            android:gravity="center">
 
-        <!-- MESSAGE BOX -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/mic_icon"
+                android:tint="#FFFFFF" />
 
-        <EditText
-            android:id="@+id/messageBox"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:hint="Type message..."
-            android:textColor="#333333"
-            android:textColorHint="#9A9A9A"
-            android:textSize="14sp"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
-            android:background="@drawable/chat_input_bg"
-            android:inputType="textMultiLine"/>
+        </LinearLayout>
 
         <!-- SEND -->
 
         <LinearLayout
             android:id="@+id/sendBtn"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:background="@drawable/send_bg"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/circle_dark_bg"
             android:gravity="center">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/send_icon"
-                android:tint="#FFFFFF"/>
+                android:tint="#FFFFFF" />
+
         </LinearLayout>
 
     </LinearLayout>

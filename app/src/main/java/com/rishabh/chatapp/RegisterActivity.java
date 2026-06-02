@@ -291,7 +291,8 @@ public class RegisterActivity extends AppCompatActivity {
                                             "default",
                                             "Online",
                                             "",
-                                            0
+                                            0,
+                                            ""
                                     );
 
                             db.child(uid)
@@ -482,7 +483,8 @@ public class RegisterActivity extends AppCompatActivity {
                                                 imageUrl,
                                                 "Online",
                                                 "",
-                                                0
+                                                0,
+                                                ""
                                         );
 
                                 db.child(uid)
