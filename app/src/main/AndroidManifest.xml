@@ -34,6 +34,10 @@
         <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".DeleteAccountActivity" />
 
+        <activity
+            android:name=".CompleteProfileActivity"
+            android:exported="false" />
+
 
         <activity
             android:name=".LoginActivity"
@@ -55,6 +59,9 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
+            <meta-data
+                android:name="com.google.firebase.auth.API_KEY"
+                android:value="@string/default_web_client_id" />
 
         </provider>
 

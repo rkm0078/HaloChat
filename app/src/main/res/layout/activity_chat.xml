@@ -75,7 +75,7 @@
             android:id="@+id/callBtn"
             android:layout_width="22dp"
             android:layout_height="22dp"
-            android:src="@drawable/call_icon"
+            android:src="@drawable/ic_call"
             android:tint="#5A6472"
             android:layout_marginEnd="20dp"/>
 

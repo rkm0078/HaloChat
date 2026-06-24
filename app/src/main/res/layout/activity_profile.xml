@@ -4,301 +4,242 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F4F4"
+    android:background="#000000"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="30dp">
 
-        <!-- TOP BAR -->
+        <!-- HEADER -->
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="24dp">
 
             <ImageView
                 android:id="@+id/backBtn"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/back_icon"
-                android:tint="#4F5D70" />
+                android:src="@drawable/ic_back"
+                app:tint="#00D2FF" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="55dp"
-                android:text="Profile Settings"
-                android:textColor="#111111"
-                android:textSize="24sp"
+                android:layout_marginStart="16dp"
+                android:text="Profile"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/saveBtn"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/save_icon"
-                android:tint="#5B6878"/>
-
-        </RelativeLayout>
-
-        <!-- PROFILE IMAGE -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="170dp"
-                android:layout_height="170dp">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profileImage"
-                    android:layout_width="170dp"
-                    android:layout_height="170dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/default_profile"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="#E5E7EB" />
-
-                <ImageView
-                    android:id="@+id/changePhotoBtn"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/circle_camera_bg"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_camera"
-                    android:tint="#FFFFFF" />
-
-                <ProgressBar
-                    android:id="@+id/uploadProgress"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_centerInParent="true"
-                    android:visibility="gone"/>
-
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="PROFILE PHOTO"
-                android:letterSpacing="0.15"
-                android:textColor="#555555"
-                android:textSize="12sp"/>
-
 
         </LinearLayout>
 
-        <!-- PERSONAL DETAILS CARD -->
+        <!-- PROFILE IMAGE -->
+
+        <RelativeLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/default_profile"
+                app:civ_border_color="#00D2FF"
+                app:civ_border_width="3dp" />
+
+            <ImageView
+                android:id="@+id/changePhotoBtn"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_camera_circle"
+                android:padding="10dp"
+                android:src="@drawable/ic_camera"
+                app:tint="#FFFFFF" />
+
+            <ProgressBar
+                android:id="@+id/uploadProgress"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/nameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="18dp"
+            android:text="Rishabh Mishra"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/usernameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="@rkm0078"
+            android:textColor="#00D2FF"
+            android:textSize="16sp" />
+
+        <!-- PERSONAL INFO -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="34dp"
-            android:layout_marginEnd="22dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="2dp"
+            android:layout_margin="24dp"
             android:orientation="vertical"
-            android:padding="24dp">
-
-            <!-- TITLE -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.08"
-                    android:text="Personal Info"
-                    android:textColor="#3F3F3F"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+            android:padding="22dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Display Name"
+                android:text="PERSONAL INFO"
+                android:textColor="#00D2FF"
                 android:textSize="14sp"
-                android:textColor="#666666"/>
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/nameEdit"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/light_round_bg"
-                android:padding="16dp"
-                android:text="Rishabh Mishra"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_marginTop="20dp"
-                android:text="Username"
-                android:textSize="14sp"
-                android:textColor="#666666"/>
+                android:background="@drawable/bg_profile_field"
+                android:hint="Full Name"
+                android:padding="18dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#666666" />
 
-
-            <LinearLayout
+            <EditText
+                android:id="@+id/usernameEdit"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/light_round_bg"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/username_icon"
-                    android:tint="#7B8A9A" />
-
-                <EditText
-                    android:id="@+id/usernameEdit"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Username"
-                    android:textColor="#111111"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Bio"
-                android:textSize="14sp"
-                android:textColor="#666666"/>
+                android:layout_height="60dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_profile_field"
+                android:hint="Username"
+                android:padding="18dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#666666" />
 
             <EditText
                 android:id="@+id/bioEdit"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/light_round_bg"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_profile_field"
                 android:gravity="top"
-                android:padding="16dp"/>
+                android:hint="Tell us about yourself"
+                android:padding="18dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#666666" />
 
         </LinearLayout>
 
-        <!-- ACCOUNT SETTINGS CARD -->
+        <!-- ACCOUNT CARD -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="22dp"
-            android:layout_marginEnd="22dp"
-            android:layout_marginBottom="30dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="2dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="22dp">
 
-            <!-- TITLE -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.08"
-                    android:text="Account"
-                    android:textColor="#3F3F3F"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_alignParentEnd="true"
-                    android:src="@drawable/settings_icon"
-                    android:tint="#666666" />
-
-            </RelativeLayout>
-
-            <!-- EMAIL -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="34dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:text="ACCOUNT"
+                android:textColor="#00D2FF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/light_round_bg"
-                    android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Email"
+                android:textColor="#888888"
+                android:textSize="14sp" />
 
-                    <ImageView
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:src="@drawable/email_icon"
-                        android:tint="#666666" />
+            <TextView
+                android:id="@+id/emailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="user@email.com"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
-                </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Status"
+                android:textColor="#888888"
+                android:textSize="14sp" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Email"
-                        android:textColor="#444444"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/emailText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="rishabhtest@gmail.com"
-                        android:textColor="#111111"
-                        android:textSize="20sp" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/next_icon"
-                    android:tint="#777777" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Online"
+                android:textColor="#00FF88"
+                android:textSize="18sp" />
 
         </LinearLayout>
+
+        <!-- SAVE -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="24dp"
+            android:text="Save Changes"
+            android:textAllCaps="false"
+            android:textColor="#9FE8FF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="@android:color/transparent"
+            app:strokeColor="#00D2FF"
+            app:strokeWidth="1dp"
+            app:cornerRadius="32dp" />
+
+        <!-- DELETE -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteBtn"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="24dp"
+            android:text="Delete Account"
+            android:textAllCaps="false"
+            android:textColor="#FF3B30"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="@android:color/transparent"
+            app:cornerRadius="32dp"
+            app:strokeColor="#FF3B30"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 

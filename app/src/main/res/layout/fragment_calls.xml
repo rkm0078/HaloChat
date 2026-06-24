@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#000000">
+
+    <!-- Empty State -->
+
+    <LinearLayout
+        android:id="@+id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/ic_call_missed"
+            android:tint="#00D2FF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="No recent calls"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Your recent voice and video\ncalls will appear here."
+            android:textColor="#777777"
+            android:textSize="15sp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartCall"
+            android:layout_width="210dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="28dp"
+            android:text="Start a new call"
+            android:textAllCaps="false"
+            android:textColor="#9FE8FF"
+            app:backgroundTint="@android:color/transparent"
+            app:strokeColor="#00D2FF"
+            app:strokeWidth="1dp"
+            app:cornerRadius="24dp"/>
+
+    </LinearLayout>
+
+    <!-- Call History -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerCalls"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+</FrameLayout>

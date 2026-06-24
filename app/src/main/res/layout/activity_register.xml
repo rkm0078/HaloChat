@@ -4,61 +4,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#000000"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="28dp">
+        android:paddingBottom="30dp">
 
-        <!-- APP NAME -->
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-<!--            <ImageView-->
-<!--                android:layout_width="36dp"-->
-<!--                android:layout_height="36dp"-->
-<!--                android:src="@drawable/app_logo"-->
-<!--                android:tint="#5F6B7A" />-->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="HaloChat"
-                android:textColor="#5F6B7A"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="60dp" />
-
-        <!-- TOP ICON -->
+        <!-- LOGO -->
 
         <ImageView
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
+            android:layout_marginTop="50dp"
             android:background="@drawable/rounded_bg"
-            android:padding="1dp"
-            android:src="@drawable/app_logo" />
+            android:padding="20dp"
+            android:src="@drawable/app_logo"
+            app:tint="#00D2FF" />
 
-        <!-- TITLE -->
+        <!-- APP NAME -->
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
-            android:text="Create Account"
-            android:textColor="#111111"
+            android:text="HaloChat"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
 
@@ -69,66 +44,38 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:text="Join the HaloChat community"
-            android:textColor="#444444"
-            android:textSize="17sp" />
+            android:gravity="center"
+            android:text="Create your account and start chatting"
+            android:textColor="#8A8A8A"
+            android:textSize="16sp" />
 
-        <!-- CARD -->
+        <!-- REGISTER CARD -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="55dp"
-            android:background="@drawable/rounded_bg"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_login_card"
             android:orientation="vertical"
-            android:padding="26dp">
+            android:padding="28dp">
 
-            <!-- PROFILE -->
-
-            <!-- PROFILE PHOTO -->
-
-            <LinearLayout
-                android:id="@+id/changePhotoBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profileImage"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/upload_cam"
-                    android:scaleType="centerCrop"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="#D0D0D0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Add Profile Photo"
-                    android:textColor="#555555"
-                    android:textSize="16sp"/>
-
-            </LinearLayout>
-
-            <!-- FIRST NAME -->
+            <!-- FULL NAME -->
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="First Name"
-                android:textColor="#222222"
-                android:textSize="16sp" />
+                android:text="Full Name"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/edittext_bg"
+                android:background="@drawable/bg_login_field"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingStart="18dp"
@@ -137,96 +84,20 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/profile_icon"
-                    android:tint="#7A7A7A" />
+                    android:src="@drawable/friend"
+                    app:tint="#00D2FF" />
 
                 <EditText
-                    android:id="@+id/firstName"
-                    android:layout_width="match_parent"
+                    android:id="@+id/fullName"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="14dp"
                     android:background="@android:color/transparent"
-                    android:hint="e.g. John"
-                    android:textColor="#222222"
-                    android:textColorHint="#808080"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <!-- LAST NAME -->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="Last Name"
-                android:textColor="#222222"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/edittext_bg"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/profile_icon"
-                    android:tint="#7A7A7A" />
-
-                <EditText
-                    android:id="@+id/lastName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:background="@android:color/transparent"
-                    android:hint="e.g. Doe"
-                    android:textColor="#222222"
-                    android:textColorHint="#808080"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <!-- USERNAME -->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="Username"
-                android:textColor="#222222"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/edittext_bg"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="18dp"
-                android:paddingEnd="18dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/profile_icon"
-                    android:tint="#7A7A7A" />
-
-                <EditText
-                    android:id="@+id/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:background="@android:color/transparent"
-                    android:hint="e.g. johndoe"
-                    android:textColor="#222222"
-                    android:textColorHint="#808080"
+                    android:hint="John Doe"
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#666666"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -236,16 +107,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="26dp"
                 android:text="Email Address"
-                android:textColor="#222222"
-                android:textSize="16sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/edittext_bg"
+                android:background="@drawable/bg_login_field"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingStart="18dp"
@@ -255,59 +127,63 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/email_icon"
-                    android:tint="#7A7A7A" />
+                    app:tint="#00D2FF" />
 
                 <EditText
                     android:id="@+id/email"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="14dp"
                     android:background="@android:color/transparent"
                     android:hint="name@example.com"
-                    android:textColor="#222222"
-                    android:textColorHint="#808080"
+                    android:inputType="textEmailAddress"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#666666"
                     android:textSize="18sp" />
 
             </LinearLayout>
+
 
             <!-- PASSWORD -->
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="26dp"
                 android:text="Password"
-                android:textColor="#222222"
-                android:textSize="16sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/edittext_bg">
+                android:background="@drawable/bg_login_field">
 
                 <ImageView
-                    android:id="@+id/securityIcon"
+                    android:id="@+id/passwordIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="18dp"
                     android:src="@drawable/lock_icon"
-                    android:tint="#7A7A7A" />
+                    app:tint="#00D2FF" />
 
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_toEndOf="@id/securityIcon"
+                    android:layout_toEndOf="@id/passwordIcon"
                     android:layout_toStartOf="@id/passwordToggle"
                     android:background="@android:color/transparent"
                     android:hint="••••••••"
                     android:inputType="textPassword"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:textColor="#222222"
-                    android:textColorHint="#808080"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#666666"
                     android:textSize="18sp" />
 
                 <ImageView
@@ -318,33 +194,133 @@
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="18dp"
                     android:src="@drawable/ic_eye"
-                    android:tint="#7A7A7A" />
+                    app:tint="#666666" />
 
             </RelativeLayout>
 
-            <!-- BUTTON -->
+            <!-- CONFIRM PASSWORD -->
 
-            <Button
-                android:id="@+id/registerBtn"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginTop="42dp"
-                android:backgroundTint="#7B8794"
-                android:text="Sign Up"
-                android:textAllCaps="false"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:text="Confirm Password"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- LOADING -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_login_field">
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/confirmPasswordIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="18dp"
+                    android:src="@drawable/lock_icon"
+                    app:tint="#00D2FF" />
+
+                <EditText
+                    android:id="@+id/confirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toEndOf="@id/confirmPasswordIcon"
+                    android:layout_toStartOf="@id/confirmPasswordToggle"
+                    android:background="@android:color/transparent"
+                    android:hint="••••••••"
+                    android:inputType="textPassword"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#666666"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/confirmPasswordToggle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_eye"
+                    app:tint="#666666" />
+
+            </RelativeLayout>
+
+            <!-- CREATE ACCOUNT BUTTON -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerBtn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="36dp"
+                android:text="Sign Up"
+                android:textAllCaps="false"
+                android:textColor="#9FE8FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="@android:color/transparent"
+                app:strokeColor="#00D2FF"
+                app:strokeWidth="1dp"
+                app:cornerRadius="27dp"/>
+
+            <!-- OR -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#222222"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:text="OR"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#222222"/>
+
+            </LinearLayout>
+
+            <!-- GOOGLE BUTTON -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/googleBtn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:text="Continue with Google"
+                android:textAllCaps="false"
+                android:textColor="#9FE8FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:iconTint="@null"
+                app:icon="@drawable/ic_google"
+                app:backgroundTint="@android:color/transparent"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:strokeColor="#711E1E"
+                app:strokeWidth="1dp"
+                app:cornerRadius="27dp"/>
+
 
             <!-- LOGIN -->
 
@@ -352,28 +328,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="32dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Already have an account? "
-                    android:textColor="#333333"
-                    android:textSize="17sp" />
+                    android:textColor="#8A8A8A"
+                    android:textSize="15sp"/>
 
                 <TextView
                     android:id="@+id/loginText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Log In"
-                    android:textColor="#5F6B7A"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:text="Sign In"
+                    android:textColor="#00D2FF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"/>
 
         <!-- FOOTER -->
 
@@ -381,12 +365,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="60dp"
-            android:layout_marginBottom="25dp"
-            android:letterSpacing="0.2"
-            android:text="POWERED BY HALOCHAT ENGINE V2.0"
-            android:textColor="#AAAAAA"
-            android:textSize="12sp" />
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
+            android:text="POWERED BY HALOCHAT"
+            android:textColor="#555555"
+            android:textSize="11sp"/>
 
     </LinearLayout>
 

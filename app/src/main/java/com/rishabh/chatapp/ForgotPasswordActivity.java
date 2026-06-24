@@ -37,7 +37,7 @@ public class ForgotPasswordActivity
         );
 
         inputField =
-                findViewById(R.id.inputField);
+                findViewById(R.id.emailField);
 
         sendBtn =
                 findViewById(R.id.sendBtn);

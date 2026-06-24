@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rishabh.chatapp.database.entity.UserEntity;
+import com.rishabh.chatapp.database.repository.UserRepository;
 
 import org.json.JSONObject;
 
@@ -51,12 +54,20 @@ public class ProfileActivity extends AppCompatActivity {
     EditText usernameEdit;
     EditText bioEdit;
 
-    ImageView saveBtn;
+    TextView statusText;
+
+    MaterialButton saveBtn;
 
     FirebaseAuth auth;
     DatabaseReference db;
+    TextView nameTitle;
+    TextView usernameTitle;
+
+    MaterialButton deleteBtn;
 
     private Uri selectedImageUri;
+
+    private UserRepository userRepository;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
             registerForActivityResult(
@@ -113,13 +124,30 @@ public class ProfileActivity extends AppCompatActivity {
         saveBtn =
                 findViewById(R.id.saveBtn);
 
+        nameTitle = findViewById(R.id.nameTitle);
+        usernameTitle = findViewById(R.id.usernameTitle);
+
+        statusText = findViewById(R.id.statusText);
+
+        deleteBtn = findViewById(R.id.deleteBtn);
+
         auth = FirebaseAuth.getInstance();
+
+        userRepository = new UserRepository(this);
 
         db = FirebaseDatabase.getInstance()
                 .getReference("Users");
 
         FirebaseUser firebaseUser =
                 auth.getCurrentUser();
+
+
+        if (firebaseUser != null) {
+
+            emailText.setText(
+                    firebaseUser.getEmail()
+            );
+        }
 
         if (firebaseUser == null) {
 
@@ -129,6 +157,41 @@ public class ProfileActivity extends AppCompatActivity {
 
         String uid =
                 firebaseUser.getUid();
+
+        userRepository.getUser(uid).observe(this, entity -> {
+
+            if (entity == null) {
+                return;
+            }
+
+            String fullName = entity.firstName;
+
+            if (entity.lastName != null &&
+                    !entity.lastName.isEmpty()) {
+
+                fullName += " " + entity.lastName;
+            }
+
+            nameEdit.setText(fullName);
+
+            usernameEdit.setText(
+                    entity.username
+            );
+
+            bioEdit.setText(
+                    entity.bio
+            );
+
+            emailText.setText(
+                    entity.email
+            );
+
+            Glide.with(ProfileActivity.this)
+                    .load(entity.profileImage)
+                    .placeholder(R.drawable.default_profile)
+                    .into(profileImage);
+
+        });
 
         db.child(uid)
                 .addListenerForSingleValueEvent(
@@ -147,8 +210,64 @@ public class ProfileActivity extends AppCompatActivity {
                                 if (user == null)
                                     return;
 
-                                String name =
-                                        user.getFullName();
+                                nameTitle.setText(user.getFullName());
+                                usernameTitle.setText("@" + user.username);
+                                statusText.setText(
+                                        user.getSafeStatus()
+                                );
+
+                                if (user.email != null &&
+                                        !user.email.isEmpty()) {
+
+                                    emailText.setText(user.email);
+
+                                } else {
+
+                                    FirebaseUser firebaseUser =
+                                            FirebaseAuth.getInstance()
+                                                    .getCurrentUser();
+
+                                    if (firebaseUser != null) {
+
+                                        emailText.setText(
+                                                firebaseUser.getEmail()
+                                        );
+                                    }
+                                }
+
+                                FirebaseUser firebaseUser =
+                                        FirebaseAuth.getInstance()
+                                                .getCurrentUser();
+
+                                if (user.email != null &&
+                                        !user.email.isEmpty()) {
+
+                                    emailText.setText(user.email);
+
+                                } else if (firebaseUser != null) {
+
+                                    emailText.setText(
+                                            firebaseUser.getEmail()
+                                    );
+                                }
+
+
+                                UserEntity entity = new UserEntity();
+
+                                entity.uid = user.uid;
+                                entity.firstName = user.firstName;
+                                entity.lastName = user.lastName;
+                                entity.username = user.username;
+                                entity.email = user.email;
+                                entity.profileImage = user.profileImage;
+                                entity.status = user.status;
+                                entity.lastSeen = user.lastSeen;
+                                entity.lastMessage = user.lastMessage;
+                                entity.lastMessageTime = user.lastMessageTime;
+                                entity.unreadCount = user.unreadCount;
+                                entity.bio = user.bio;
+
+                                userRepository.insertUser(entity);
 
                                 nameEdit.setText(user.getFullName());
 
@@ -182,19 +301,34 @@ public class ProfileActivity extends AppCompatActivity {
 
         saveBtn.setOnClickListener(v -> {
 
-            Toast.makeText(
-                    this,
-                    "Profile Saved",
-                    Toast.LENGTH_SHORT
-            ).show();
-
             HashMap<String,Object> updates =
                     new HashMap<>();
 
-            updates.put(
-                    "firstName",
-                    nameEdit.getText().toString()
-            );
+            String fullName = nameEdit.getText().toString().trim();
+
+            if (fullName.isEmpty()) {
+
+                Toast.makeText(
+                        ProfileActivity.this,
+                        "Name cannot be empty",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            String[] parts = fullName.split(" ", 2);
+
+            String firstName = parts[0];
+
+            String lastName = "";
+
+            if (parts.length > 1) {
+                lastName = parts[1];
+            }
+
+            updates.put("firstName", firstName);
+            updates.put("lastName", lastName);
 
             updates.put(
                     "username",
@@ -212,7 +346,41 @@ public class ProfileActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance()
                     .getReference("Users")
                     .child(currentUid)
-                    .updateChildren(updates);
+                    .updateChildren(updates)
+                    .addOnSuccessListener(unused -> {
+
+                        nameTitle.setText(fullName);
+
+                        usernameTitle.setText(
+                                "@" + usernameEdit.getText().toString().trim()
+                        );
+
+                        Toast.makeText(
+                                ProfileActivity.this,
+                                "Profile Updated",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+
+                    });
+
+            nameTitle.setText(fullName);
+
+            usernameTitle.setText(
+                    "@" + usernameEdit.getText().toString().trim()
+            );
+        });
+
+
+        deleteBtn.setOnClickListener(v -> {
+
+            startActivity(
+                    new Intent(
+                            ProfileActivity.this,
+                            DeleteAccountActivity.class
+                    )
+            );
+
         });
 
         changePhotoBtn.setOnClickListener(v -> {

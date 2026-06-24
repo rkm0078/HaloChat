@@ -3,6 +3,7 @@ package com.rishabh.chatapp;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,17 +63,17 @@ public class FrequentAdapter
 
         // SAFE USERNAME
 
-        if (user.getFullName() != null &&
-                !user.getFullName().isEmpty()) {
+        String name = user.getFullName();
 
-            holder.userName.setText(
-                    user.getFullName()
-            );
-
-        } else {
-
-            holder.userName.setText("User");
+        if (name == null || name.trim().isEmpty()) {
+            name = user.username;
         }
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "User";
+        }
+
+        holder.userName.setText(name);
 
         if (user.lastMessage != null) {
 
@@ -130,11 +131,7 @@ public class FrequentAdapter
         if (user.unreadCount > 0) {
 
             holder.unreadCount.setVisibility(
-                    View.VISIBLE
-            );
-
-            holder.unreadCount.setText(
-                    String.valueOf(user.unreadCount)
+                    user.unreadCount > 0 ? View.VISIBLE : View.GONE
             );
 
         } else {
@@ -176,6 +173,36 @@ public class FrequentAdapter
             );
 
             context.startActivity(intent);
+        });
+
+        holder.itemView.setOnTouchListener((v, event) -> {
+
+            switch (event.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+
+                    v.animate()
+                            .scaleX(0.97f)
+                            .scaleY(0.97f)
+                            .setDuration(100)
+                            .start();
+
+                    break;
+
+                case MotionEvent.ACTION_UP:
+
+                case MotionEvent.ACTION_CANCEL:
+
+                    v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .start();
+
+                    break;
+            }
+
+            return false;
         });
     }
 

@@ -1,6 +1,7 @@
 package com.rishabh.chatapp;
 
-import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,8 +10,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,30 +29,71 @@ import java.util.HashSet;
 
 public class AddFriendsActivity extends AppCompatActivity {
 
-    RecyclerView recyclerUsers;
-    RecyclerView requestRecycler;
+    // =========================
+    // Views
+    // =========================
 
-    ArrayList<User> users;
-    ArrayList<User> requestUsers;
+    private RecyclerView usersRecycler;
 
-    UserRecyclerAdapter adapter;
-    FriendRequestAdapter requestAdapter;
+    private RecyclerView requestRecycler;
 
-    ImageView backBtn;
-    ImageView settingsBtn;
+    private EditText searchBar;
 
-    EditText searchBar;
+    private ImageView backBtn;
 
-    TextView requestCount;
+    private TextView requestCount;
 
-    LinearLayout emptyRequestBox;
+    private LinearLayout emptyRequestLayout;
 
-    FirebaseAuth auth;
+    private View qrSection;
 
-    String currentUid;
+    private View pendingSection;
 
-    HashSet<String> friendIds;
-    HashSet<String> requestIds;
+    private View suggestedSection;
+
+    private LinearLayout inviteFriendsBtn;
+
+    private LinearLayout btnMyQr;
+
+    private LinearLayout btnScanQr;
+
+    // =========================
+    // Firebase
+    // =========================
+
+    private FirebaseAuth auth;
+
+    private String currentUid;
+
+
+    // =========================
+    // Lists
+    // =========================
+
+    private final ArrayList<User> users =
+            new ArrayList<>();
+
+    private final ArrayList<User> allUsers =
+            new ArrayList<>();
+
+    private final ArrayList<User> requestUsers =
+            new ArrayList<>();
+
+    // =========================
+    // Status Sets
+    // =========================
+
+    private final HashSet<String> friendIds = new HashSet<>();
+    private final HashSet<String> sentRequestIds = new HashSet<>();
+    private final HashSet<String> receivedRequestIds = new HashSet<>();
+
+    // =========================
+    // Adapter
+    // =========================
+
+    private UserRecyclerAdapter userAdapter;
+
+    private FriendRequestAdapter requestAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +106,7 @@ public class AddFriendsActivity extends AppCompatActivity {
         // FIND VIEWS
         // =========================
 
-        recyclerUsers =
+        usersRecycler =
                 findViewById(R.id.recyclerUsers);
 
         requestRecycler =
@@ -71,17 +115,32 @@ public class AddFriendsActivity extends AppCompatActivity {
         searchBar =
                 findViewById(R.id.searchBar);
 
-        requestCount =
-                findViewById(R.id.requestCount);
-
-        emptyRequestBox =
-                findViewById(R.id.emptyRequestLayout);
-
         backBtn =
                 findViewById(R.id.backBtn);
 
-        settingsBtn =
-                findViewById(R.id.settingsBtn);
+        requestCount =
+                findViewById(R.id.requestCount);
+
+        emptyRequestLayout =
+                findViewById(R.id.emptyRequestLayout);
+
+        qrSection =
+                findViewById(R.id.qrSection);
+
+        pendingSection =
+                findViewById(R.id.pendingSection);
+
+        suggestedSection =
+                findViewById(R.id.suggestedSection);
+
+        inviteFriendsBtn =
+                findViewById(R.id.inviteFriendsBtn);
+
+        btnMyQr =
+                findViewById(R.id.btnMyQr);
+
+        btnScanQr =
+                findViewById(R.id.btnScanQr);
 
         // =========================
         // FIREBASE
@@ -91,52 +150,57 @@ public class AddFriendsActivity extends AppCompatActivity {
 
         currentUid = auth.getUid();
 
-        friendIds = new HashSet<>();
+        if (currentUid == null) {
 
-        requestIds = new HashSet<>();
+            finish();
 
-        // =========================
-        // BACK BUTTON
-        // =========================
-
-        backBtn.setOnClickListener(v -> finish());
-
-        settingsBtn.setOnClickListener(v -> {
-
-            Intent intent =
-                    new Intent(
-                            AddFriendsActivity.this,
-                            SettingsActivity.class
-                    );
-
-            startActivity(intent);
-        });
+            return;
+        }
 
         // =========================
-        // USERS LIST
+        // USER RECYCLER
         // =========================
 
-        users = new ArrayList<>();
+        usersRecycler.setLayoutManager(
+                new LinearLayoutManager(this)
+        );
 
-        adapter =
+        usersRecycler.setHasFixedSize(false);
+
+        userAdapter =
                 new UserRecyclerAdapter(
                         this,
                         users,
                         friendIds,
-                        requestIds
+                        sentRequestIds,
+                        receivedRequestIds,
+                        new UserRecyclerAdapter.OnFriendClickListener() {
+
+                            @Override
+                            public void onChatClick(User user) {
+                            }
+
+                            @Override
+                            public void onVoiceCallClick(User user) {
+                            }
+
+                            @Override
+                            public void onVideoCallClick(User user) {
+                            }
+                        }
                 );
 
-        recyclerUsers.setLayoutManager(
+        usersRecycler.setAdapter(userAdapter);
+
+        // =========================
+        // REQUEST RECYCLER
+        // =========================
+
+        requestRecycler.setLayoutManager(
                 new LinearLayoutManager(this)
         );
 
-        recyclerUsers.setAdapter(adapter);
-
-        // =========================
-        // REQUEST LIST
-        // =========================
-
-        requestUsers = new ArrayList<>();
+        requestRecycler.setHasFixedSize(false);
 
         requestAdapter =
                 new FriendRequestAdapter(
@@ -144,181 +208,53 @@ public class AddFriendsActivity extends AppCompatActivity {
                         requestUsers
                 );
 
-        requestRecycler.setLayoutManager(
-                new LinearLayoutManager(this)
-        );
-
         requestRecycler.setAdapter(requestAdapter);
 
-        // =========================
-        // LOAD SENT REQUEST IDS
-        // =========================
-
-        FirebaseDatabase.getInstance()
-                .getReference("FriendRequests")
-                .addValueEventListener(
-                        new ValueEventListener() {
-
-                            @Override
-                            public void onDataChange(
-                                    @NonNull DataSnapshot snapshot
-                            ) {
-
-                                requestIds.clear();
-
-                                for (DataSnapshot targetUser :
-                                        snapshot.getChildren()) {
-
-                                    if (targetUser.hasChild(currentUid)) {
-
-                                        requestIds.add(
-                                                targetUser.getKey()
-                                        );
-                                    }
-                                }
-
-                                loadUsers();
-                            }
-
-                            @Override
-                            public void onCancelled(
-                                    @NonNull DatabaseError error
-                            ) {
-
-                            }
-                        });
 
         // =========================
-        // LOAD FRIEND IDS
+        // BUTTONS
         // =========================
 
-        FirebaseDatabase.getInstance()
-                .getReference("Friends")
-                .child(currentUid)
-                .addValueEventListener(
-                        new ValueEventListener() {
+        backBtn.setOnClickListener(v -> finish());
 
-                            @Override
-                            public void onDataChange(
-                                    @NonNull DataSnapshot snapshot
-                            ) {
+        btnMyQr.setOnClickListener(v ->
 
-                                friendIds.clear();
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Personal QR profiles will be available in a future update."
+                )
 
-                                for (DataSnapshot data :
-                                        snapshot.getChildren()) {
+        );
 
-                                    friendIds.add(
-                                            data.getKey()
-                                    );
-                                }
+        btnScanQr.setOnClickListener(v ->
 
-                                loadUsers();
-                            }
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "QR code scanning will be available in a future update."
+                )
 
-                            @Override
-                            public void onCancelled(
-                                    @NonNull DatabaseError error
-                            ) {
+        );
 
-                            }
-                        });
+        inviteFriendsBtn.setOnClickListener(v ->
+
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Invite friends will be available in a future update."
+                )
+
+        );
 
         // =========================
-        // LOAD FRIEND REQUESTS
+        // LOAD DATA
         // =========================
 
-        FirebaseDatabase.getInstance()
-                .getReference("FriendRequests")
-                .child(currentUid)
-                .addValueEventListener(
-                        new ValueEventListener() {
+        loadUsers();
 
-                            @Override
-                            public void onDataChange(
-                                    @NonNull DataSnapshot snapshot
-                            ) {
+        loadFriendIds();
 
-                                requestUsers.clear();
+        loadSentRequests();
 
-                                int count =
-                                        (int) snapshot.getChildrenCount();
-
-                                requestCount.setText(
-                                        String.valueOf(count)
-                                );
-
-                                if (count > 0) {
-
-                                    requestRecycler.setVisibility(
-                                            View.VISIBLE
-                                    );
-
-                                    emptyRequestBox.setVisibility(
-                                            View.GONE
-                                    );
-
-                                } else {
-
-                                    requestRecycler.setVisibility(
-                                            View.GONE
-                                    );
-
-                                    emptyRequestBox.setVisibility(
-                                            View.VISIBLE
-                                    );
-                                }
-
-                                // LOAD REAL USERS
-
-                                for (DataSnapshot data :
-                                        snapshot.getChildren()) {
-
-                                    String uid =
-                                            data.getKey();
-
-                                    if (uid == null)
-                                        continue;
-
-                                    FirebaseDatabase.getInstance()
-                                            .getReference("Users")
-                                            .child(uid)
-                                            .addListenerForSingleValueEvent(
-                                                    new ValueEventListener() {
-
-                                                        @Override
-                                                        public void onDataChange(
-                                                                @NonNull DataSnapshot snapshot
-                                                        ) {
-
-                                                            User user =
-                                                                    snapshot.getValue(User.class);
-
-                                                            if (user == null)
-                                                                return;
-
-                                                            requestUsers.add(user);
-
-                                                            requestAdapter.notifyDataSetChanged();
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(
-                                                                @NonNull DatabaseError error
-                                                        ) {
-
-                                                        }
-                                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(
-                                    @NonNull DatabaseError error
-                            ) {
-
-                            }
-                        });
+        loadIncomingRequests();
 
         // =========================
         // SEARCH
@@ -356,17 +292,19 @@ public class AddFriendsActivity extends AppCompatActivity {
                     ) {
 
                     }
-                });
+                }
+        );
     }
 
     // =========================
-    // LOAD USERS
-    // =========================
+// LOAD FRIEND IDS
+// =========================
 
-    private void loadUsers() {
+    private void loadFriendIds() {
 
         FirebaseDatabase.getInstance()
-                .getReference("Users")
+                .getReference("Friends")
+                .child(currentUid)
                 .addValueEventListener(
                         new ValueEventListener() {
 
@@ -375,37 +313,106 @@ public class AddFriendsActivity extends AppCompatActivity {
                                     @NonNull DataSnapshot snapshot
                             ) {
 
+                                friendIds.clear();
+
+                                for (DataSnapshot ds : snapshot.getChildren()) {
+
+                                    friendIds.add(ds.getKey());
+                                }
+
+                                userAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                            }
+                        });
+    }
+
+
+// =========================
+// LOAD SENT REQUESTS
+// =========================
+
+    private void loadSentRequests() {
+
+        FirebaseDatabase.getInstance()
+                .getReference("FriendRequests")
+                .child(currentUid)
+                .child("sent")
+                .addValueEventListener(
+                        new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                sentRequestIds.clear();
+
+                                for (DataSnapshot ds :
+                                        snapshot.getChildren()) {
+
+                                    sentRequestIds.add(ds.getKey());
+                                }
+
+                                userAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                            }
+                        });
+    }
+
+
+// =========================
+// LOAD ALL USERS
+// =========================
+
+    private void loadUsers() {
+
+        FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                allUsers.clear();
+
                                 users.clear();
 
-                                for (DataSnapshot data :
+                                for (DataSnapshot ds :
                                         snapshot.getChildren()) {
 
                                     User user =
-                                            data.getValue(User.class);
+                                            ds.getValue(User.class);
 
                                     if (user == null)
                                         continue;
 
-                                    if (user.uid == null)
+                                    user.uid = ds.getKey();
+
+                                    if (currentUid.equals(user.uid)) {
                                         continue;
+                                    }
 
-                                    if (user.uid.equals(currentUid))
-                                        continue;
-
-                                    // ALREADY FRIEND
-
-                                    if (friendIds.contains(user.uid))
-                                        continue;
-
-                                    // REQUEST ALREADY SENT
-
-                                    if (requestIds.contains(user.uid))
-                                        continue;
-
-                                    users.add(user);
+                                    allUsers.add(user);
                                 }
 
-                                adapter.notifyDataSetChanged();
+                                users.addAll(allUsers);
+
+                                userAdapter.notifyDataSetChanged();
                             }
 
                             @Override
@@ -418,36 +425,256 @@ public class AddFriendsActivity extends AppCompatActivity {
     }
 
     // =========================
-    // SEARCH FILTER
+// LOAD INCOMING REQUESTS
+// =========================
+
+    private void loadIncomingRequests() {
+
+        FirebaseDatabase.getInstance()
+                .getReference("FriendRequests")
+                .child(currentUid)
+                .child("received")
+                .addValueEventListener(
+                        new ValueEventListener() {
+
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
+
+                                receivedRequestIds.clear();
+
+                                requestUsers.clear();
+
+                                for (DataSnapshot ds :
+                                        snapshot.getChildren()) {
+
+                                    String uid = ds.getKey();
+
+                                    if (uid == null)
+                                        continue;
+
+                                    receivedRequestIds.add(uid);
+
+                                    FirebaseDatabase.getInstance()
+                                            .getReference("Users")
+                                            .child(uid)
+                                            .addListenerForSingleValueEvent(
+                                                    new ValueEventListener() {
+
+                                                        @Override
+                                                        public void onDataChange(
+                                                                @NonNull DataSnapshot snapshot
+                                                        ) {
+
+                                                            User user =
+                                                                    snapshot.getValue(User.class);
+
+                                                            if (user == null)
+                                                                return;
+
+                                                            user.uid = snapshot.getKey();
+
+                                                            boolean exists = false;
+
+                                                            for (User u : requestUsers) {
+
+                                                                if (u.uid.equals(user.uid)) {
+
+                                                                    exists = true;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            if (!exists) {
+
+                                                                requestUsers.add(user);
+
+                                                                requestAdapter.notifyDataSetChanged();
+
+                                                                updateRequestUI();
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(
+                                                                @NonNull DatabaseError error
+                                                        ) {
+
+                                                        }
+                                                    });
+                                }
+
+                                updateRequestUI();
+
+                                userAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                            }
+                        });
+    }
+
     // =========================
+// SEARCH USERS
+// =========================
 
     private void filterUsers(String text) {
 
-        ArrayList<User> filtered =
-                new ArrayList<>();
+        boolean searching =
+                text != null &&
+                        !text.trim().isEmpty();
 
-        for (User user : users) {
+        if (searching) {
 
-            String username =
-                    user.username != null
-                            ? user.username
-                            : "";
+            qrSection.setVisibility(View.GONE);
+            pendingSection.setVisibility(View.GONE);
+            suggestedSection.setVisibility(View.GONE);
+            inviteFriendsBtn.setVisibility(View.GONE);
 
-            if (username.toLowerCase()
-                    .contains(text.toLowerCase())) {
+        } else {
 
-                filtered.add(user);
+            qrSection.setVisibility(View.VISIBLE);
+            pendingSection.setVisibility(View.VISIBLE);
+            suggestedSection.setVisibility(View.VISIBLE);
+            inviteFriendsBtn.setVisibility(View.VISIBLE);
+        }
+
+        users.clear();
+
+        if (text == null ||
+                text.trim().isEmpty()) {
+
+            allUsers.sort((u1, u2) -> {
+
+                String name1 = u1.username == null ? "" : u1.username;
+
+                String name2 = u2.username == null ? "" : u2.username;
+
+                return name1.compareToIgnoreCase(name2);
+            });
+
+            users.addAll(allUsers);
+
+        } else {
+
+            String query =
+                    text.toLowerCase().trim();
+
+            for (User user : allUsers) {
+
+                String username =
+                        user.username == null
+                                ? ""
+                                : user.username.toLowerCase();
+
+                String email =
+                        user.email == null
+                                ? ""
+                                : user.email.toLowerCase();
+
+                String fullName =
+                        user.getFullName() == null
+                                ? ""
+                                : user.getFullName().toLowerCase();
+
+                if (username.contains(query)
+                        || email.contains(query)
+                        || fullName.contains(query)
+                        || user.uid.toLowerCase().contains(query)) {
+
+                    users.add(user);
+                }
             }
         }
 
-        adapter =
-                new UserRecyclerAdapter(
-                        this,
-                        filtered,
-                        friendIds,
-                        requestIds
+        userAdapter.notifyDataSetChanged();
+    }
+
+    // =========================
+// UPDATE REQUEST UI
+// =========================
+
+    private void updateRequestUI() {
+
+        requestCount.setText(
+                String.valueOf(
+                        requestUsers.size()
+                )
+        );
+
+        if (requestUsers.isEmpty()) {
+
+            emptyRequestLayout.setVisibility(
+                    View.VISIBLE
+            );
+
+            requestRecycler.setVisibility(
+                    View.GONE
+            );
+
+        } else {
+
+            emptyRequestLayout.setVisibility(
+                    View.GONE
+            );
+
+            requestRecycler.setVisibility(
+                    View.VISIBLE
+            );
+        }
+    }
+    private void showComingSoonDialog(
+            String title,
+            String message
+    ) {
+
+        View dialogView =
+                getLayoutInflater().inflate(
+                        R.layout.dialog_coming_soon,
+                        null
                 );
 
-        recyclerUsers.setAdapter(adapter);
+        AlertDialog dialog =
+                new AlertDialog.Builder(
+                        AddFriendsActivity.this
+                )
+                        .setView(dialogView)
+                        .create();
+
+        if (dialog.getWindow() != null) {
+
+            dialog.getWindow().setBackgroundDrawable(
+                    new ColorDrawable(
+                            Color.TRANSPARENT
+                    )
+            );
+        }
+
+        TextView titleText =
+                dialogView.findViewById(
+                        R.id.titleText
+                );
+
+        TextView messageText =
+                dialogView.findViewById(
+                        R.id.messageText
+                );
+
+        titleText.setText(title);
+
+        messageText.setText(message);
+
+        dialogView.findViewById(
+                R.id.okBtn
+        ).setOnClickListener(v ->
+                dialog.dismiss()
+        );
+
+        dialog.show();
     }
 }

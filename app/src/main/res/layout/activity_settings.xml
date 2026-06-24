@@ -1,287 +1,334 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6F6F6">
+    android:background="#000000"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="40dp">
+        android:orientation="vertical">
 
-        <!-- TOP BAR -->
+        <!-- HEADER -->
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="78dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="20dp">
 
             <ImageView
                 android:id="@+id/backBtn"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/back_icon"
-                android:tint="#444444"/>
+                android:src="@drawable/ic_back"
+                android:tint="#FFFFFF"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="54dp"
+                android:layout_marginStart="16dp"
                 android:text="Settings"
-                android:textColor="#4C5967"
-                android:textSize="24sp"
+                android:textColor="#FFFFFF"
+                android:textSize="26sp"
                 android:textStyle="bold"/>
 
+        </LinearLayout>
+
+        <!-- SEARCH -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_profile_field"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp">
+
             <ImageView
-                android:id="@+id/searchBtn"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/search_icon"
+                android:tint="#8A8A8A"/>
+
+            <EditText
+                android:id="@+id/searchEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:background="@android:color/transparent"
+                android:hint="Search settings..."
+                android:textColor="#FFFFFF"
+                android:textColorHint="#8A8A8A"/>
+
+        </LinearLayout>
+
+        <!-- PROFILE SECTION -->
+
+        <LinearLayout
+            android:id="@+id/profileSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImage"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:src="@drawable/default_profile"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/nameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rishabh Mishra"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/usernameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@rishabh"
+                    android:textColor="#00D2FF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/qrBtn"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/search_icon"
-                android:tint="#444444"/>
-        </RelativeLayout>
+                android:src="@drawable/ic_qr"
+                android:tint="#00D2FF"/>
+
+        </LinearLayout>
+
+        <!-- DIVIDER -->
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E9E9E9"/>
+            android:layout_marginTop="20dp"
+            android:background="#151515"/>
 
-        <!-- PROFILE -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="34dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profileImage"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:src="@drawable/default_profile"
-                android:scaleType="centerCrop"
-                app:civ_border_width="3dp"
-                app:civ_border_color="#E5E5E5" />
-
-            <TextView
-                android:id="@+id/usernameText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="rishabhtest"
-                android:textColor="#111111"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/emailText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="rishabhtest@gmail.com"
-                android:textColor="#444444"
-                android:textSize="17sp"/>
-        </LinearLayout>
-
-        <!-- ACCOUNT SECURITY -->
+        <!-- ACCOUNT -->
 
         <LinearLayout
+            android:id="@+id/accountRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="34dp"
-            android:layout_marginEnd="18dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="1dp"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
-            <!-- HEADER -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="19dp"
+                android:src="@drawable/friend"
+                android:tint="#00D2FF" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/security_icon"
-                    android:tint="#5A6572"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="ACCOUNT SECURITY"
-                    android:textColor="#333333"
-                    android:textSize="14sp"
+                    android:text="Account"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete Account, password change"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- PROFILE -->
+        <!-- LINKED DEVICES -->
+
+        <LinearLayout
+            android:id="@+id/linkedDevicesRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/device"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/profileSettingsBtn"
-                android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/profile_icon"
-                    android:tint="#333333"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:text="Linked devices"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Profile Settings"
-                        android:textColor="#111111"
-                        android:textSize="19sp"
-                        android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Use your account on other devices"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Manage personal info"
-                        android:textColor="#777777"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- CHANGE PASSWORD -->
+        <!-- PRIVACY -->
+
+        <LinearLayout
+            android:id="@+id/privacyRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/privacy_icon"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/changePasswordBtn"
-                android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/password_icon"
-                    android:tint="#333333"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:text="Privacy"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Change Password"
-                        android:textColor="#111111"
-                        android:textSize="19sp"
-                        android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Blocked contacts, profile photo"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last changed recently"
-                        android:textColor="#777777"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- DELETE ACCOUNT -->
+        <!-- SECURITY -->
+
+        <LinearLayout
+            android:id="@+id/securityRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/security_icon"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/deleteBtn"
-                android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/delete_icon"
-                    android:tint="#E53935"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:text="Security"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Delete Account"
-                        android:textColor="#E53935"
-                        android:textSize="19sp"
-                        android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Two-step verification"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Permanently remove account"
-                        android:textColor="#E57373"
-                        android:textSize="14sp"/>
-                </LinearLayout>
+            </LinearLayout>
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#D38B8B"/>
+        </LinearLayout>
+
+        <!-- CHATS -->
+
+        <LinearLayout
+            android:id="@+id/chatsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/chat_icon"
+                android:tint="#00D2FF"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chats"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Theme, wallpapers, histor"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
         </LinearLayout>
@@ -289,435 +336,351 @@
         <!-- NOTIFICATIONS -->
 
         <LinearLayout
+            android:id="@+id/notificationsRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="18dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="1dp"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
-            <!-- HEADER -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/notification_icon"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/notification_icon"
-                    android:tint="#5A6572"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="NOTIFICATIONS"
-                    android:textColor="#333333"
-                    android:textSize="14sp"
+                    android:text="Notifications"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
-
-            <!-- PUSH -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="84dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/notification_icon"
-                    android:tint="#333333"/>
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:text="Push Notifications"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-
-                <Switch
-                    android:id="@+id/pushSwitch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Messages and calls"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- SUPPORT -->
+        <!-- DATA AND STORAGE -->
 
         <LinearLayout
+            android:id="@+id/storageRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="18dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="1dp"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
-            <!-- HEADER -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/store_ic"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/help_icon"
-                    android:tint="#5A6572"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="SUPPORT"
-                    android:textColor="#333333"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
-
-            <!-- HELP CENTER -->
-
-            <LinearLayout
-                android:id="@+id/helpBtn"
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/helpcenter_icon"
-                    android:tint="#333333"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:text="Help Center"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
+                    android:text="Storage and Data"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Network usage"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- CONTACT -->
+        <!-- APP LANGUAGE -->
+
+        <LinearLayout
+            android:id="@+id/languageRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/lang_ic"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/contactBtn"
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/email_icon"
-                    android:tint="#333333"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:text="Contact Us"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
+                    android:text="App Language"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="English (System)"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- PRIVACY -->
+        <!-- HELP -->
+
+        <LinearLayout
+            android:id="@+id/helpRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/help_icon"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/privacyBtn"
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/privacy_icon"
-                    android:tint="#333333"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:text="Privacy Policy"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
+                    android:text="Help"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Help center"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
+        </LinearLayout>
 
-            <!-- ABOUT -->
+        <!-- INVITE A FRIEND -->
+
+        <LinearLayout
+            android:id="@+id/inviteRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/add_friend_icon"
+                android:tint="#00D2FF"/>
 
             <LinearLayout
-                android:id="@+id/aboutBtn"
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/info_icon"
-                    android:tint="#333333"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
+                    android:text="Invite a Friend"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Share HaloChat"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ABOUT -->
+
+        <LinearLayout
+            android:id="@+id/aboutRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/info_icon"
+                android:tint="#00D2FF"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="About HaloChat"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- APP UPDATES -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="18dp"
-            android:background="@drawable/rounded_white"
-            android:elevation="1dp"
-            android:orientation="vertical">
-
-            <!-- HEADER -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/update_icon"
-                    android:tint="#5A6572"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="APP UPDATES"
-                    android:textColor="#333333"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
+                    android:text="About the HaloChat"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
-
-            <!-- CURRENT VERSION -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/info_icon"
-                    android:tint="#333333"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Current Version"
-                        android:textColor="#111111"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="HaloChat v2.2.2"
-                        android:textColor="#777777"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"/>
-
-            <!-- CHECK UPDATE -->
-
-            <LinearLayout
-                android:id="@+id/checkUpdateBtn"
-                android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:gravity="center_vertical"
-                android:paddingStart="26dp"
-                android:paddingEnd="26dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/update_icon"
-                    android:tint="#333333"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="1"
-                    android:text="Check for Updates"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:rotation="180"
-                    android:src="@drawable/back_icon"
-                    android:tint="#999999"/>
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- SIGN OUT -->
+        <!-- UPDATE -->
 
         <LinearLayout
-            android:id="@+id/logoutBtn"
+            android:id="@+id/updateRow"
             android:layout_width="match_parent"
-            android:layout_height="62dp"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="18dp"
-            android:background="@drawable/logout_bg"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/update_icon"
+                android:tint="#00D2FF"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="App Updates"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Check for new features"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- LOGOUT -->
+
+        <LinearLayout
+            android:id="@+id/logoutRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="20dp">
 
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/logout_icon"
-                android:tint="#FFFFFF"/>
+                android:tint="#FF0000"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Sign Out"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:layout_marginStart="18dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Logout"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sign out of your account"
+                    android:textColor="#8A8A8A"
+                    android:textSize="13sp"/>
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- FOOTER -->
+        <!-- Repeat same block for:
+             Privacy
+             Security
+             Chats
+             Notifications
+             Data and Storage
+             App Language
+             Help
+             Invite a Friend -->
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/versionText"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="70dp"
-            android:text="POWERED BY HALOCHAT"
-            android:textColor="#B5B5B5"
-            android:textSize="14sp"/>
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="Version 1.0.0"
+            android:textColor="#444444"
+            android:textSize="10sp"/>
 
     </LinearLayout>
 

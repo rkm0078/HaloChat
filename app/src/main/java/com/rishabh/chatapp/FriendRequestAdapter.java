@@ -5,25 +5,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.bumptech.glide.Glide;
-import de.hdodenhof.circleimageview.CircleImageView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendRequestAdapter
         extends RecyclerView.Adapter<FriendRequestAdapter.ViewHolder> {
 
-    Context context;
+    private final Context context;
 
-    ArrayList<User> users;
+    private final ArrayList<User> users;
 
     public FriendRequestAdapter(
             Context context,
@@ -31,8 +33,9 @@ public class FriendRequestAdapter
     ) {
 
         this.context = context;
-
         this.users = users;
+
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -45,7 +48,7 @@ public class FriendRequestAdapter
         View view =
                 LayoutInflater.from(context)
                         .inflate(
-                                R.layout.request_card,
+                                R.layout.item_friend_request,
                                 parent,
                                 false
                         );
@@ -59,166 +62,262 @@ public class FriendRequestAdapter
             int position
     ) {
 
-        User user = users.get(position);
-
-        // =========================
-        // USERNAME FIX
-        // =========================
-
-        String name = "User";
-
-        if (user.username != null &&
-                !user.username.trim().isEmpty()) {
-
-            name = user.username;
-
-        } else if (user.email != null &&
-                !user.email.trim().isEmpty()) {
-
-            name = user.email.split("@")[0];
+        if (position < 0 || position >= users.size()) {
+            return;
         }
 
-        holder.username.setText(name);
+        User user = users.get(position);
 
-        // =========================
-        // REQUEST TEXT
-        // =========================
+        if (user == null) {
+            return;
+        }
 
-        holder.timeText.setText(
-                "Sends request"
+        // Username
+
+        holder.username.setText(
+                user.username == null || user.username.isEmpty()
+                        ? "User"
+                        : user.username
         );
 
-        // =========================
-        // PROFILE IMAGE
-        // =========================
+        // Full Name
+
+        if (holder.fullName != null) {
+            holder.fullName.setText(
+                    user.getFullName() == null
+                            ? ""
+                            : user.getFullName()
+            );
+        }
+
+        // Profile Image
 
         Glide.with(context)
-                .load(user.getSafeProfileImage())
+                .load(
+                        user.profileImage == null
+                                ? ""
+                                : user.profileImage
+                )
                 .placeholder(R.drawable.default_profile)
                 .error(R.drawable.default_profile)
                 .into(holder.profileImage);
 
-        // =========================
-        // ACCEPT BUTTON
-        // =========================
-
-        holder.acceptBtn.setOnClickListener(v -> {
-
-            int adapterPosition =
-                    holder.getAdapterPosition();
-
-            if (adapterPosition ==
-                    RecyclerView.NO_POSITION) {
-
-                return;
-            }
-
-            String currentUid =
-                    FirebaseAuth.getInstance()
-                            .getUid();
-
-            if (currentUid == null
-                    || user.uid == null) {
-
-                Toast.makeText(
-                        context,
-                        "Something went wrong",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return;
-            }
-
-            // ADD FRIEND BOTH SIDES
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Friends")
-                    .child(currentUid)
-                    .child(user.uid)
-                    .setValue(true);
-
-            FirebaseDatabase.getInstance()
-                    .getReference("Friends")
-                    .child(user.uid)
-                    .child(currentUid)
-                    .setValue(true);
-
-            // REMOVE REQUEST
-
-            FirebaseDatabase.getInstance()
-                    .getReference("FriendRequests")
-                    .child(currentUid)
-                    .child(user.uid)
-                    .removeValue();
+        holder.profileImage.setOnClickListener(v -> {
 
             Toast.makeText(
                     context,
-                    "Friend Added",
+                    "Profile feature coming soon",
                     Toast.LENGTH_SHORT
             ).show();
 
-            users.remove(adapterPosition);
+        });
 
-            notifyItemRemoved(adapterPosition);
+        holder.username.setOnClickListener(v -> {
 
-            notifyItemRangeChanged(
-                    adapterPosition,
-                    users.size()
+            Toast.makeText(
+                    context,
+                    "Profile feature coming soon",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        });
+
+        // Accept Button
+
+        holder.acceptBtn.setOnClickListener(v -> {
+
+            String currentUid =
+                    FirebaseAuth.getInstance().getUid();
+
+            if (currentUid == null) {
+                return;
+            }
+
+            if (user.uid == null || user.uid.isEmpty()) {
+                return;
+            }
+
+            HashMap<String, Object> updates =
+                    new HashMap<>();
+
+            // =========================
+            // ADD TO FRIENDS
+            // =========================
+
+            updates.put(
+                    "/Friends/"
+                            + currentUid
+                            + "/"
+                            + user.uid,
+                    true
             );
+
+            updates.put(
+                    "/Friends/"
+                            + user.uid
+                            + "/"
+                            + currentUid,
+                    true
+            );
+
+            // =========================
+            // REMOVE FRIEND REQUEST
+            // =========================
+
+            updates.put(
+                    "/FriendRequests/"
+                            + currentUid
+                            + "/received/"
+                            + user.uid,
+                    null
+            );
+
+            updates.put(
+                    "/FriendRequests/"
+                            + user.uid
+                            + "/sent/"
+                            + currentUid,
+                    null
+            );
+
+            // Prevent double click
+
+            holder.acceptBtn.setEnabled(false);
+            holder.rejectBtn.setEnabled(false);
+
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .updateChildren(updates)
+                    .addOnSuccessListener(unused -> {
+
+                        int adapterPosition =
+                                holder.getBindingAdapterPosition();
+
+                        if (adapterPosition != RecyclerView.NO_POSITION) {
+
+                            users.remove(adapterPosition);
+
+                            notifyItemRemoved(adapterPosition);
+                            notifyItemRangeChanged(adapterPosition, users.size());
+                        }
+
+                        Toast.makeText(
+                                context,
+                                "You are now friends!",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    })
+                    .addOnFailureListener(e -> {
+
+                        holder.acceptBtn.setEnabled(true);
+                        holder.rejectBtn.setEnabled(true);
+
+                        Toast.makeText(
+                                context,
+                                "Operation failed",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    });
         });
 
         // =========================
-        // REJECT BUTTON
+        // REJECT REQUEST
         // =========================
 
         holder.rejectBtn.setOnClickListener(v -> {
 
-            int adapterPosition =
-                    holder.getAdapterPosition();
-
-            if (adapterPosition ==
-                    RecyclerView.NO_POSITION) {
-
-                return;
-            }
-
             String currentUid =
-                    FirebaseAuth.getInstance()
-                            .getUid();
+                    FirebaseAuth.getInstance().getUid();
 
-            if (currentUid == null
-                    || user.uid == null) {
-
+            if (currentUid == null) {
                 return;
             }
+
+            if (user.uid == null || user.uid.isEmpty()) {
+                return;
+            }
+
+            HashMap<String, Object> updates =
+                    new HashMap<>();
+
+            // Remove request from receiver
+
+            updates.put(
+                    "/FriendRequests/"
+                            + currentUid
+                            + "/received/"
+                            + user.uid,
+                    null
+            );
+
+            // Remove request from sender
+
+            updates.put(
+                    "/FriendRequests/"
+                            + user.uid
+                            + "/sent/"
+                            + currentUid,
+                    null
+            );
+
+            // Prevent double click
+
+            holder.acceptBtn.setEnabled(false);
+            holder.rejectBtn.setEnabled(false);
 
             FirebaseDatabase.getInstance()
-                    .getReference("FriendRequests")
-                    .child(currentUid)
-                    .child(user.uid)
-                    .removeValue();
+                    .getReference()
+                    .updateChildren(updates)
+                    .addOnSuccessListener(unused -> {
 
-            Toast.makeText(
-                    context,
-                    "Request Rejected",
-                    Toast.LENGTH_SHORT
-            ).show();
+                        int adapterPosition =
+                                holder.getBindingAdapterPosition();
 
-            users.remove(adapterPosition);
+                        if (adapterPosition
+                                != RecyclerView.NO_POSITION) {
 
-            notifyItemRemoved(adapterPosition);
+                            users.remove(adapterPosition);
 
-            notifyItemRangeChanged(
-                    adapterPosition,
-                    users.size()
-            );
+                            notifyItemRemoved(adapterPosition);
+                            notifyItemRangeChanged(adapterPosition, users.size());
+                        }
+
+                        Toast.makeText(
+                                context,
+                                "Request declined",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    })
+                    .addOnFailureListener(e -> {
+
+                        holder.acceptBtn.setEnabled(true);
+                        holder.rejectBtn.setEnabled(true);
+
+                        Toast.makeText(
+                                context,
+                                "Operation failed",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    });
+
         });
     }
 
     @Override
     public int getItemCount() {
+        return users == null ? 0 : users.size();
+    }
 
-        return users.size();
+    @Override
+    public long getItemId(int position) {
+
+        User user = users.get(position);
+
+        if (user == null || user.uid == null) {
+            return position;
+        }
+
+        return user.uid.hashCode();
     }
 
     // =========================
@@ -228,15 +327,15 @@ public class FriendRequestAdapter
     public static class ViewHolder
             extends RecyclerView.ViewHolder {
 
-        CircleImageView profileImage;
+        final CircleImageView profileImage;
 
-        TextView username;
+        final TextView username;
 
-        TextView timeText;
+        final TextView fullName;
 
-        Button acceptBtn;
+        final Button acceptBtn;
 
-        Button rejectBtn;
+        final Button rejectBtn;
 
         public ViewHolder(
                 @NonNull View itemView
@@ -254,10 +353,8 @@ public class FriendRequestAdapter
                             R.id.username
                     );
 
-            timeText =
-                    itemView.findViewById(
-                            R.id.timeText
-                    );
+            fullName =
+                    itemView.findViewById(R.id.requestText);
 
             acceptBtn =
                     itemView.findViewById(
@@ -265,9 +362,7 @@ public class FriendRequestAdapter
                     );
 
             rejectBtn =
-                    itemView.findViewById(
-                            R.id.rejectBtn
-                    );
+                    itemView.findViewById(R.id.declineBtn);
         }
     }
 }

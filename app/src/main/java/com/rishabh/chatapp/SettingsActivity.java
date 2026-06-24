@@ -1,66 +1,73 @@
 package com.rishabh.chatapp;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-
 import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import de.hdodenhof.circleimageview.CircleImageView;
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import androidx.annotation.NonNull;
-import android.view.View;
-
-import android.app.ProgressDialog;
-import android.os.Environment;
-
-import androidx.core.content.FileProvider;
+import com.rishabh.chatapp.database.DatabaseClient;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-
 public class SettingsActivity extends AppCompatActivity {
 
     CircleImageView profileImage;
-    TextView usernameText, emailText;
-
-    LinearLayout checkUpdateBtn;
-    LinearLayout logoutBtn;
-
-    LinearLayout aboutBtn;
-
-    LinearLayout changePasswordBtn;
-
-    LinearLayout deleteBtn;
-
-    Switch pushSwitch;
-
-    LinearLayout profileSettingsBtn;
 
     FirebaseAuth auth;
+
+    ImageView qrBtn;
+    LinearLayout profileSection;
+    TextView usernameText;
+    LinearLayout accountRow;
+    LinearLayout linkedDevicesRow;
+    LinearLayout privacyRow;
+    LinearLayout securityRow;
+    LinearLayout chatsRow;
+    LinearLayout notificationsRow;
+    LinearLayout storageRow;
+    LinearLayout languageRow;
+    LinearLayout helpRow;
+    LinearLayout inviteRow;
+    LinearLayout aboutRow;
+    LinearLayout updateRow;
+    LinearLayout logoutRow;
+    ImageView backBtn;
+    TextView versionText;
+    TextView nameText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +76,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_settings);
 
-        ImageView backBtn;
         // =========================
         // FIREBASE
         // =========================
@@ -83,50 +89,50 @@ public class SettingsActivity extends AppCompatActivity {
         profileImage =
                 findViewById(R.id.profileImage);
 
-        profileSettingsBtn =
-                findViewById(R.id.profileSettingsBtn);
-
         usernameText =
                 findViewById(R.id.usernameText);
 
-        emailText =
-                findViewById(R.id.emailText);
+        profileSection = findViewById(R.id.profileSection);
 
-        checkUpdateBtn =
-                findViewById(R.id.checkUpdateBtn);
+        qrBtn = findViewById(R.id.qrBtn);
 
-        logoutBtn =
-                findViewById(R.id.logoutBtn);
+        accountRow = findViewById(R.id.accountRow);
+        linkedDevicesRow = findViewById(R.id.linkedDevicesRow);
+        privacyRow = findViewById(R.id.privacyRow);
+        securityRow = findViewById(R.id.securityRow);
+        chatsRow = findViewById(R.id.chatsRow);
+        notificationsRow = findViewById(R.id.notificationsRow);
+        storageRow = findViewById(R.id.storageRow);
+        languageRow = findViewById(R.id.languageRow);
+        helpRow = findViewById(R.id.helpRow);
+        inviteRow = findViewById(R.id.inviteRow);
+        aboutRow = findViewById(R.id.aboutRow);
+        updateRow = findViewById(R.id.updateRow);
+        logoutRow = findViewById(R.id.logoutRow);
 
-        changePasswordBtn =
-                findViewById(R.id.changePasswordBtn);
+        versionText = findViewById(R.id.versionText);
 
-        deleteBtn =
-                findViewById(R.id.deleteBtn);
+        nameText = findViewById(R.id.nameText);
+        usernameText = findViewById(R.id.usernameText);
+        backBtn = findViewById(R.id.backBtn);
 
-        pushSwitch =
-                findViewById(R.id.pushSwitch);
-        aboutBtn =
-                findViewById(R.id.aboutBtn);
+        // =========================
+        // BACK BUTTON
+        // =========================
+
+
+        backBtn.setOnClickListener(v -> finish());
 
         // =========================
         // USER INFO
         // =========================
 
-        if (auth.getCurrentUser() != null) {
-
-            String email =
-                    auth.getCurrentUser().getEmail();
-
-            emailText.setText(email);
-
-            String username =
-                    email.split("@")[0];
-
-            usernameText.setText(username);
-        }
-
         String uid = auth.getUid();
+
+        if (uid == null) {
+            finish();
+            return;
+        }
 
         FirebaseDatabase.getInstance()
                 .getReference("Users")
@@ -147,14 +153,32 @@ public class SettingsActivity extends AppCompatActivity {
                                 if (user == null)
                                     return;
 
+                                nameText.setText(
+                                        user.getFullName()
+                                );
+
+                                if (user.username != null &&
+                                        !user.username.isEmpty()) {
+
+                                    usernameText.setText(
+                                            "@" + user.username
+                                    );
+
+                                } else {
+
+                                    usernameText.setText("@user");
+                                }
+
                                 Glide.with(
                                                 SettingsActivity.this
                                         )
-                                        .load(user.profileImage)
-                                        .placeholder(
-                                                R.drawable.default_profile
+                                        .load(
+                                                user.profileImage == null ||
+                                                        user.profileImage.isEmpty()
+                                                        ? R.drawable.default_profile
+                                                        : user.profileImage
                                         )
-                                        .error(
+                                        .placeholder(
                                                 R.drawable.default_profile
                                         )
                                         .into(profileImage);
@@ -167,30 +191,36 @@ public class SettingsActivity extends AppCompatActivity {
 
                             }
                         });
-        // =========================
-        // LOGOUT
-        // =========================
-
-        logoutBtn.setOnClickListener(v -> {
-
-            auth.signOut();
-
-            Intent intent =
-                    new Intent(
-                            SettingsActivity.this,
-                            LoginActivity.class
-                    );
-
-            startActivity(intent);
-
-            finishAffinity();
-        });
 
         // =========================
-        // PROFILE SETTINGS
+        // VERSION
         // =========================
 
-        profileSettingsBtn.setOnClickListener(v -> {
+        try {
+
+            String currentVersion =
+                    getPackageManager()
+                            .getPackageInfo(
+                                    getPackageName(),
+                                    0
+                            ).versionName;
+
+            versionText.setText(
+                    "Version " + currentVersion
+            );
+
+        } catch (Exception e) {
+
+            versionText.setText(
+                    "Version Unknown"
+            );
+        }
+
+        // =========================
+        // PROFILE SECTION
+        // =========================
+
+        profileSection.setOnClickListener(v -> {
 
             startActivity(
                     new Intent(
@@ -198,89 +228,152 @@ public class SettingsActivity extends AppCompatActivity {
                             ProfileActivity.class
                     )
             );
-
         });
 
         // =========================
-        // CHANGE PASSWORD
+        // ABOUT
         // =========================
 
-        changePasswordBtn.setOnClickListener(v -> {
+        aboutRow.setOnClickListener(v -> {
 
             startActivity(
                     new Intent(
                             SettingsActivity.this,
-                            ChangePasswordActivity.class
+                            AboutActivity.class
                     )
             );
         });
 
         // =========================
-        // DELETE ACCOUNT
+        // UPDATE
         // =========================
 
-        deleteBtn.setOnClickListener(v -> {
-
-            startActivity(
-                    new Intent(
-                            SettingsActivity.this,
-                            DeleteAccountActivity.class
-                    )
-            );
-
-        });
-        // =========================
-        // PUSH SWITCH
-        // =========================
-
-        pushSwitch.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-
-                    if (isChecked) {
-
-                        Toast.makeText(
-                                this,
-                                "Notifications ON",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                    } else {
-
-                        Toast.makeText(
-                                this,
-                                "Notifications OFF",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
-                });
+        updateRow.setOnClickListener(v ->
+                checkForUpdates());
 
         // =========================
-        // About button
+        // LOGOUT
         // =========================
 
-        aboutBtn.setOnClickListener(v -> {
+        logoutRow.setOnClickListener(v -> {
+
+            auth.signOut();
+
+            new Thread(() ->
+                    DatabaseClient
+                            .getInstance(this)
+                            .getDatabase()
+                            .clearAllTables()
+            ).start();
 
             Intent intent =
                     new Intent(
                             SettingsActivity.this,
-                            AboutActivity.class
+                            LoginActivity.class
                     );
 
+            intent.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+            );
+
             startActivity(intent);
-        });
-
-        // =========================
-        // Check Update
-        // =========================
-        checkUpdateBtn.setOnClickListener(v -> checkForUpdates());
-
-        backBtn =
-                findViewById(R.id.backBtn);
-
-        backBtn.setOnClickListener(v -> {
 
             finish();
         });
+
+        // =========================
+        // SETTINGS WHICH ARE COMMING SOON
+        // =========================
+
+        qrBtn.setOnClickListener(view ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "QR code section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        accountRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Account section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        linkedDevicesRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Linked devices section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        privacyRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Privacy section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        securityRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Security section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        chatsRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Chats section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        notificationsRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Notifications section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        storageRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Storage and data section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        languageRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Language section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        helpRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Help section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        inviteRow.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Invite section will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
     }
 
     private void checkForUpdates() {
@@ -636,4 +729,66 @@ public class SettingsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void showComingSoonDialog(
+            String title,
+            String message,
+            String buttonText,
+            Runnable action
+    ) {
+
+        View dialogView =
+                getLayoutInflater().inflate(
+                        R.layout.dialog_coming_soon,
+                        null
+                );
+
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .create();
+
+        if (dialog.getWindow() != null) {
+
+            dialog.getWindow().setBackgroundDrawable(
+                    new ColorDrawable(
+                            Color.TRANSPARENT
+                    )
+            );
+        }
+
+        TextView titleText =
+                dialogView.findViewById(
+                        R.id.titleText
+                );
+
+        TextView messageText =
+                dialogView.findViewById(
+                        R.id.messageText
+                );
+
+        MaterialButton okBtn =
+                dialogView.findViewById(
+                        R.id.okBtn
+                );
+
+        titleText.setText(title);
+
+        messageText.setText(message);
+
+        okBtn.setText(buttonText);
+
+        okBtn.setOnClickListener(v -> {
+
+            dialog.dismiss();
+
+            if (action != null) {
+
+                action.run();
+            }
+        });
+
+        dialog.show();
+    }
+
 }

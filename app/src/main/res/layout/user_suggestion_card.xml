@@ -1,77 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="96dp"
-    android:layout_marginBottom="18dp"
-    android:background="@drawable/rounded_white"
-    android:elevation="3dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="18dp"
-    android:paddingEnd="18dp">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    android:padding="12dp"
+    android:background="@drawable/bg_card">
 
-    <!-- PROFILE CIRCLE -->
-
-    <LinearLayout
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:background="@drawable/circle_light_bg"
-        android:gravity="center">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileImage"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/default_profile"/>
-
-    </LinearLayout>
-
-    <!-- USER INFO -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profileImage"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:src="@drawable/default_profile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <LinearLayout
+        android:id="@+id/textContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/profileImage"
+        app:layout_constraintEnd_toStartOf="@id/addFriendBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rishabh"
-            android:textColor="#111111"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/mutualText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="Recommended for you"
-            android:textColor="#666666"
-            android:textSize="16sp" />
+            android:textColor="#8A8A8A"
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
     </LinearLayout>
 
-    <!-- ADD BUTTON -->
-
-    <LinearLayout
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addFriendBtn"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:background="@drawable/dark_round_bg"
-        android:gravity="center">
+        android:layout_width="95dp"
+        android:layout_height="38dp"
+        android:text="ADD"
+        android:textAllCaps="false"
+        android:textColor="#00D2FF"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        app:cornerRadius="19dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#00D2FF"
+        app:backgroundTint="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <ImageView
-            android:id="@+id/addIcon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/add_friend_icon"
-            android:tint="#FFFFFF" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

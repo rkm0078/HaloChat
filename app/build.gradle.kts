@@ -11,8 +11,8 @@ android {
         applicationId = "com.rishabh.chatapp"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
-        versionName = "2.2.2"
+        versionCode = 1
+        versionName = "1.0.0"
     }
 
     buildTypes {
@@ -56,4 +56,10 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
+    // Room Database
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
 }

@@ -3,6 +3,20 @@
 
     <style name="Theme.HaloChat" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">#00D2FF</item>
+        <item name="colorSecondary">#00D2FF</item>
+        <item name="colorTertiary">#00D2FF</item>
+    </style>
+
+    <style name="HaloChatDialog"
+        parent="ThemeOverlay.Material3.MaterialAlertDialog">
+
+        <item name="colorSurface">#0D0D0D</item>
+
+        <item name="colorOnSurface">#FFFFFF</item>
+
+        <item name="colorPrimary">#00D2FF</item>
+
     </style>
 
 </resources>

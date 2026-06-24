@@ -1,55 +1,42 @@
 package com.rishabh.chatapp;
 
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.common.api.ApiException;
+
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.ImageView;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    CircleImageView profileImage;
-
-    LinearLayout changePhotoBtn;
-
-    Uri selectedImageUri;
-
-    EditText firstName;
-    EditText lastName;
-    EditText username;
     EditText email;
     EditText password;
     ImageView passwordToggle;
 
-    Button registerBtn;
+    MaterialButton registerBtn;
 
     TextView loginText;
 
@@ -57,24 +44,15 @@ public class RegisterActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
 
-    DatabaseReference db;
+    EditText fullName;
+    EditText confirmPassword;
 
-    private final ActivityResultLauncher<Intent> imagePickerLauncher =
-            registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
+    MaterialButton googleBtn;
 
-                        if (result.getResultCode() == RESULT_OK
-                                && result.getData() != null) {
+    private GoogleSignInClient googleSignInClient;
 
-                            selectedImageUri =
-                                    result.getData().getData();
-
-                            profileImage.setImageURI(
-                                    selectedImageUri
-                            );
-                        }
-                    });
+    private ActivityResultLauncher<Intent>
+            googleLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,20 +65,16 @@ public class RegisterActivity extends AppCompatActivity {
         // FIND VIEWS
         // =========================
 
-        profileImage =
-                findViewById(R.id.profileImage);
 
-        changePhotoBtn =
-                findViewById(R.id.changePhotoBtn);
+        fullName =
+                findViewById(
+                        R.id.fullName
+                );
 
-        firstName =
-                findViewById(R.id.firstName);
-
-        lastName =
-                findViewById(R.id.lastName);
-
-        username =
-                findViewById(R.id.username);
+        confirmPassword =
+                findViewById(
+                        R.id.confirmPassword
+                );
 
         email =
                 findViewById(R.id.email);
@@ -114,6 +88,11 @@ public class RegisterActivity extends AppCompatActivity {
         registerBtn =
                 findViewById(R.id.registerBtn);
 
+        googleBtn =
+                findViewById(
+                        R.id.googleBtn
+                );
+
         loginText =
                 findViewById(R.id.loginText);
 
@@ -124,26 +103,30 @@ public class RegisterActivity extends AppCompatActivity {
         // FIREBASE
         // =========================
 
-        changePhotoBtn.setOnClickListener(v -> {
-
-            Intent intent =
-                    new Intent(Intent.ACTION_PICK);
-
-            intent.setType("image/*");
-
-            imagePickerLauncher.launch(intent);
-        });
-
-        // =========================
-        // FIREBASE
-        // =========================
-
         auth =
                 FirebaseAuth.getInstance();
 
-        db =
-                FirebaseDatabase.getInstance()
-                        .getReference("Users");
+        // =========================
+        // GOOGLE SIGN IN
+        // =========================
+
+        GoogleSignInOptions gso =
+                new GoogleSignInOptions.Builder(
+                        GoogleSignInOptions.DEFAULT_SIGN_IN
+                )
+                        .requestIdToken(
+                                getString(
+                                        R.string.default_web_client_id
+                                )
+                        )
+                        .requestEmail()
+                        .build();
+
+        googleSignInClient =
+                GoogleSignIn.getClient(
+                        this,
+                        gso
+                );
 
         // =========================
         // PASSWORD TOGGLE
@@ -187,21 +170,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerBtn.setOnClickListener(v -> {
 
-            String f =
-                    firstName.getText()
-                            .toString()
-                            .trim();
-
-            String l =
-                    lastName.getText()
-                            .toString()
-                            .trim();
-
-            String u =
-                    username.getText()
-                            .toString()
-                            .trim();
-
             String e =
                     email.getText()
                             .toString()
@@ -214,11 +182,10 @@ public class RegisterActivity extends AppCompatActivity {
 
             // VALIDATION
 
-            if (f.isEmpty()
-                    || l.isEmpty()
-                    || u.isEmpty()
-                    || e.isEmpty()
-                    || p.isEmpty()) {
+            if (fullName.getText().toString().trim().isEmpty()
+                    || email.getText().toString().trim().isEmpty()
+                    || password.getText().toString().trim().isEmpty()
+                    || confirmPassword.getText().toString().trim().isEmpty()) {
 
                 Toast.makeText(
                         this,
@@ -234,6 +201,22 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(
                         this,
                         "Password must be at least 6 characters",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            // PASSWORD MATCH
+
+            if (!password.getText().toString()
+                    .equals(
+                            confirmPassword.getText().toString()
+                    )) {
+
+                Toast.makeText(
+                        this,
+                        "Passwords do not match",
                         Toast.LENGTH_SHORT
                 ).show();
 
@@ -264,89 +247,61 @@ public class RegisterActivity extends AppCompatActivity {
                             return;
                         }
 
-                        String uid =
-                                auth.getCurrentUser()
-                                        .getUid();
+                        FirebaseUser firebaseUser =
+                                FirebaseAuth.getInstance()
+                                        .getCurrentUser();
 
-                        if (selectedImageUri != null) {
+                        if (firebaseUser != null) {
 
-                            uploadToCloudinaryAndRegister(
-                                    selectedImageUri,
-                                    uid,
-                                    f,
-                                    l,
-                                    u,
-                                    e
-                            );
-
-                        } else {
-
-                            User user =
-                                    new User(
-                                            uid,
-                                            f,
-                                            l,
-                                            u,
-                                            e,
-                                            "default",
-                                            "Online",
-                                            "",
-                                            0,
-                                            ""
-                                    );
-
-                            db.child(uid)
-                                    .setValue(user)
+                            firebaseUser.sendEmailVerification()
                                     .addOnSuccessListener(unused -> {
 
-                                        FirebaseUser firebaseUser =
-                                                FirebaseAuth.getInstance()
-                                                        .getCurrentUser();
+                                        progressBar.setVisibility(View.GONE);
 
-                                        if (firebaseUser != null) {
+                                        registerBtn.setEnabled(true);
 
-                                            firebaseUser.sendEmailVerification()
-                                                    .addOnSuccessListener(task -> {
+                                        registerBtn.setText("Create Account");
 
-                                                        progressBar.setVisibility(View.GONE);
+                                        showHaloDialog(
+                                                "Verify Your Email",
+                                                "A verification email has been sent.\n\nPlease verify your email and then login.",
+                                                "GO TO LOGIN",
+                                                () -> {
 
-                                                        registerBtn.setEnabled(true);
+                                                    FirebaseAuth.getInstance()
+                                                            .signOut();
 
-                                                        registerBtn.setText("Sign Up");
+                                                    Intent intent =
+                                                            new Intent(
+                                                                    RegisterActivity.this,
+                                                                    LoginActivity.class
+                                                            );
 
-                                                        Toast.makeText(
-                                                                RegisterActivity.this,
-                                                                "Verification email sent.Please check Inbox or Spam folder.",
-                                                                Toast.LENGTH_LONG
-                                                        ).show();
+                                                    intent.setFlags(
+                                                            Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                    );
 
-                                                        FirebaseAuth.getInstance()
-                                                                .signOut();
+                                                    startActivity(intent);
 
-                                                        startActivity(
-                                                                new Intent(
-                                                                        RegisterActivity.this,
-                                                                        LoginActivity.class
-                                                                )
-                                                        );
+                                                    finish();
+                                                }
+                                        );
+                                    })
 
-                                                        finish();
-                                                    })
-                                                    .addOnFailureListener(error -> {
+                                    .addOnFailureListener(error -> {
 
-                                                        progressBar.setVisibility(View.GONE);
+                                        progressBar.setVisibility(View.GONE);
 
-                                                        registerBtn.setEnabled(true);
+                                        registerBtn.setEnabled(true);
 
-                                                        registerBtn.setText("Sign Up");
+                                        registerBtn.setText("Create Account");
 
-                                                        Toast.makeText(
-                                                                RegisterActivity.this,
-                                                                error.getMessage(),
-                                                                Toast.LENGTH_LONG
-                                                        ).show();
-                                                    });
-                                        }
+                                        Toast.makeText(
+                                                RegisterActivity.this,
+                                                error.getMessage(),
+                                                Toast.LENGTH_LONG
+                                        ).show();
                                     });
                         }
 
@@ -369,6 +324,56 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         // =========================
+        // GOOGLE BUTTON
+        // =========================
+
+        googleBtn.setOnClickListener(v -> {
+
+            Intent signInIntent =
+                    googleSignInClient
+                            .getSignInIntent();
+
+            googleLauncher.launch(
+                    signInIntent
+            );
+
+        });
+
+        // =========================
+        // GOOGLE LAUNCHER
+        // =========================
+
+        googleLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.StartActivityForResult(),
+                        result -> {
+
+                            try {
+
+                                GoogleSignInAccount account =
+                                        GoogleSignIn
+                                                .getSignedInAccountFromIntent(
+                                                        result.getData()
+                                                )
+                                                .getResult(
+                                                        ApiException.class
+                                                );
+
+                                firebaseAuthWithGoogle(
+                                        account.getIdToken()
+                                );
+
+                            } catch (Exception e) {
+
+                                Toast.makeText(
+                                        this,
+                                        e.getMessage(),
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            }
+                        });
+
+        // =========================
         // LOGIN TEXT
         // =========================
 
@@ -384,202 +389,136 @@ public class RegisterActivity extends AppCompatActivity {
 
             finish();
         });
+
     }
 
-    private void uploadToCloudinaryAndRegister(
-            Uri imageUri,
-            String uid,
-            String f,
-            String l,
-            String u,
-            String e
+    private void showHaloDialog(
+            String title,
+            String message,
+            String buttonText,
+            Runnable action
     ) {
 
-        String cloudName = "domvygmqx";
-        String uploadPreset = "halochat_profiles";
+        View dialogView =
+                getLayoutInflater().inflate(
+                        R.layout.dialog_coming_soon,
+                        null
+                );
 
-        try {
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .create();
 
-            byte[] imageBytes =
-                    getContentResolver()
-                            .openInputStream(imageUri)
-                            .readAllBytes();
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT)
+        );
 
-            RequestBody requestBody =
-                    new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart(
-                                    "file",
-                                    "profile.jpg",
-                                    RequestBody.create(imageBytes)
-                            )
-                            .addFormDataPart(
-                                    "upload_preset",
-                                    uploadPreset
-                            )
-                            .build();
+        TextView titleText =
+                dialogView.findViewById(R.id.titleText);
 
-            Request request =
-                    new Request.Builder()
-                            .url(
-                                    "https://api.cloudinary.com/v1_1/"
-                                            + cloudName
-                                            + "/image/upload"
-                            )
-                            .post(requestBody)
-                            .build();
+        TextView messageText =
+                dialogView.findViewById(R.id.messageText);
 
-            new OkHttpClient()
-                    .newCall(request)
-                    .enqueue(new Callback() {
+        MaterialButton okBtn =
+                dialogView.findViewById(R.id.okBtn);
 
-                        @Override
-                        public void onFailure(
-                                Call call,
-                                IOException ex
-                        ) {
+        titleText.setText(title);
+        messageText.setText(message);
+        okBtn.setText(buttonText);
 
-                            runOnUiThread(() -> {
+        okBtn.setOnClickListener(v -> {
 
-                                progressBar.setVisibility(View.GONE);
+            dialog.dismiss();
 
-                                registerBtn.setEnabled(true);
+            if (action != null) {
+                action.run();
+            }
+        });
 
-                                registerBtn.setText("Sign Up");
+        dialog.show();
+    }
 
-                                Toast.makeText(
-                                        RegisterActivity.this,
-                                        "Image Upload Failed",
-                                        Toast.LENGTH_LONG
-                                ).show();
+    private void firebaseAuthWithGoogle(
+            String idToken
+    ) {
+
+        AuthCredential credential =
+                GoogleAuthProvider.getCredential(
+                        idToken,
+                        null
+                );
+
+        auth.signInWithCredential(credential)
+                .addOnSuccessListener(result -> {
+
+                    FirebaseUser firebaseUser =
+                            result.getUser();
+
+                    String uid =
+                            firebaseUser.getUid();
+
+                    FirebaseDatabase.getInstance()
+                            .getReference("Users")
+                            .child(uid)
+                            .get()
+                            .addOnSuccessListener(snapshot -> {
+
+                                if (snapshot.exists()) {
+
+                                    startActivity(
+                                            new Intent(
+                                                    RegisterActivity.this,
+                                                    HomeActivity.class
+                                            )
+                                    );
+
+                                    finish();
+
+                                } else {
+
+                                    Intent intent =
+                                            new Intent(
+                                                    RegisterActivity.this,
+                                                    CompleteProfileActivity.class
+                                            );
+
+                                    intent.putExtra(
+                                            "fullName",
+                                            firebaseUser.getDisplayName()
+                                    );
+
+                                    intent.putExtra(
+                                            "email",
+                                            firebaseUser.getEmail()
+                                    );
+
+                                    intent.putExtra(
+                                            "photo",
+                                            firebaseUser.getPhotoUrl() != null
+                                                    ? firebaseUser.getPhotoUrl().toString()
+                                                    : ""
+                                    );
+
+                                    intent.putExtra(
+                                            "googleLogin",
+                                            true
+                                    );
+
+                                    startActivity(intent);
+
+                                    finish();
+                                }
                             });
-                        }
+                })
 
-                        @Override
-                        public void onResponse(
-                                Call call,
-                                Response response
-                        ) throws IOException {
+                .addOnFailureListener(error -> {
 
-                            try {
-
-                                JSONObject object =
-                                        new JSONObject(
-                                                response.body().string()
-                                        );
-
-                                String imageUrl =
-                                        object.getString(
-                                                "secure_url"
-                                        );
-
-                                User user =
-                                        new User(
-                                                uid,
-                                                f,
-                                                l,
-                                                u,
-                                                e,
-                                                imageUrl,
-                                                "Online",
-                                                "",
-                                                0,
-                                                ""
-                                        );
-
-                                db.child(uid)
-                                        .setValue(user)
-                                        .addOnSuccessListener(unused -> {
-
-                                            FirebaseUser firebaseUser =
-                                                    FirebaseAuth.getInstance()
-                                                            .getCurrentUser();
-
-                                            if (firebaseUser != null) {
-
-                                                firebaseUser.sendEmailVerification()
-                                                        .addOnSuccessListener(unused2 -> {
-
-                                                            runOnUiThread(() -> {
-
-                                                                progressBar.setVisibility(View.GONE);
-
-                                                                registerBtn.setEnabled(true);
-
-                                                                registerBtn.setText("Sign Up");
-
-                                                                Toast.makeText(
-                                                                        RegisterActivity.this,
-                                                                        "Verification email sent.\nPlease check Inbox or Spam folder.",
-                                                                        Toast.LENGTH_LONG
-                                                                ).show();
-
-                                                                FirebaseAuth.getInstance()
-                                                                        .signOut();
-
-                                                                startActivity(
-                                                                        new Intent(
-                                                                                RegisterActivity.this,
-                                                                                LoginActivity.class
-                                                                        )
-                                                                );
-
-                                                                finish();
-                                                            });
-                                                        })
-                                                        .addOnFailureListener(error -> {
-
-                                                            runOnUiThread(() -> {
-
-                                                                progressBar.setVisibility(View.GONE);
-
-                                                                registerBtn.setEnabled(true);
-
-                                                                registerBtn.setText("Sign Up");
-
-                                                                Toast.makeText(
-                                                                        RegisterActivity.this,
-                                                                        error.getMessage(),
-                                                                        Toast.LENGTH_LONG
-                                                                ).show();
-                                                            });
-                                                        });
-                                            }
-                                        });
-
-                            } catch (Exception ex) {
-
-                                runOnUiThread(() -> {
-
-                                    progressBar.setVisibility(View.GONE);
-
-                                    registerBtn.setEnabled(true);
-
-                                    registerBtn.setText("Sign Up");
-
-                                    Toast.makeText(
-                                            RegisterActivity.this,
-                                            ex.getMessage(),
-                                            Toast.LENGTH_LONG
-                                    ).show();
-                                });
-                            }
-                        }
-                    });
-
-        } catch (Exception ex) {
-
-            progressBar.setVisibility(View.GONE);
-
-            registerBtn.setEnabled(true);
-
-            registerBtn.setText("Sign Up");
-
-            Toast.makeText(
-                    this,
-                    ex.getMessage(),
-                    Toast.LENGTH_LONG
-            ).show();
-        }
+                    Toast.makeText(
+                            this,
+                            error.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
     }
 }
