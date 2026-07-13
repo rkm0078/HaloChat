@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,25 +22,27 @@ public class MessageAdapter
 
     private final ArrayList<Message> messages;
 
-    private final String receiverUid;
-
     private static final int ITEM_SENT = 1;
     private static final int ITEM_RECEIVE = 2;
 
+    private static final int ITEM_DATE = 3;
+
     public MessageAdapter(
             Context context,
-            ArrayList<Message> messages,
-            String receiverUid
+            ArrayList<Message> messages
     ) {
         this.context = context;
         this.messages = messages;
-        this.receiverUid = receiverUid;
     }
 
     @Override
     public int getItemViewType(int position) {
 
         Message message = messages.get(position);
+
+        if (message.isDateChip) {
+            return ITEM_DATE;
+        }
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             return ITEM_RECEIVE;
@@ -55,6 +58,22 @@ public class MessageAdapter
                 : ITEM_RECEIVE;
     }
 
+    public static class DateViewHolder
+            extends RecyclerView.ViewHolder {
+
+        final TextView dateText;
+
+        public DateViewHolder(@NonNull View itemView) {
+
+            super(itemView);
+
+            dateText =
+                    itemView.findViewById(
+                            R.id.dateText
+                    );
+        }
+    }
+
     @Override
     @NonNull
     public RecyclerView.ViewHolder onCreateViewHolder(
@@ -62,11 +81,23 @@ public class MessageAdapter
             int viewType
     ) {
 
+        if (viewType == ITEM_DATE) {
+
+            View view = LayoutInflater.from(context)
+                    .inflate(
+                            R.layout.item_date_chip,
+                            parent,
+                            false
+                    );
+
+            return new DateViewHolder(view);
+        }
+
         if (viewType == ITEM_SENT) {
 
             View view = LayoutInflater.from(context)
                     .inflate(
-                            R.layout.item_sender,
+                            R.layout.item_send_message,
                             parent,
                             false
                     );
@@ -77,7 +108,7 @@ public class MessageAdapter
 
             View view = LayoutInflater.from(context)
                     .inflate(
-                            R.layout.item_receiver,
+                            R.layout.item_received_message,
                             parent,
                             false
                     );
@@ -92,7 +123,17 @@ public class MessageAdapter
             int position
     ) {
 
+
         Message message = messages.get(position);
+
+        if (holder instanceof DateViewHolder) {
+
+            ((DateViewHolder) holder)
+                    .dateText
+                    .setText(message.dateText);
+
+            return;
+        }
 
         String time =
                 formatter.format(
@@ -104,45 +145,58 @@ public class MessageAdapter
             SenderViewHolder senderHolder =
                     (SenderViewHolder) holder;
 
-            senderHolder.senderMessage.setText(
+            senderHolder.messageText.setText(
                     message.message
             );
 
-            senderHolder.senderTime.setText(
+            senderHolder.timeText.setText(
                     time
             );
 
-            // Message Status
+            if ("sending".equals(message.status)) {
 
-            if (message.seen) {
-
-                senderHolder.seenStatus.setText(
-                        "✓✓ Seen"
+                senderHolder.messageStatusIcon.setImageResource(
+                        R.drawable.ic_clock
                 );
 
-            } else if (message.delivered) {
+            } else if ("sent".equals(message.status)) {
 
-                senderHolder.seenStatus.setText(
-                        "✓✓ Delivered"
+                senderHolder.messageStatusIcon.setImageResource(
+                        R.drawable.ic_single_tick
+                );
+
+            } else if ("delivered".equals(message.status)) {
+
+                senderHolder.messageStatusIcon.setImageResource(
+                        R.drawable.ic_double_tick
+                );
+
+            } else if ("seen".equals(message.status)) {
+
+                senderHolder.messageStatusIcon.setImageResource(
+                        R.drawable.ic_double_tick_seen
                 );
 
             } else {
 
-                senderHolder.seenStatus.setText(
-                        "✓ Sent"
+                senderHolder.messageStatusIcon.setImageResource(
+                        R.drawable.ic_clock
                 );
             }
+
+            // Message Status
+
 
         } else {
 
             ReceiverViewHolder receiverHolder =
                     (ReceiverViewHolder) holder;
 
-            receiverHolder.receiverMessage.setText(
+            receiverHolder.messageText.setText(
                     message.message
             );
 
-            receiverHolder.receiverTime.setText(
+            receiverHolder.timeText.setText(
                     time
             );
         }
@@ -162,9 +216,9 @@ public class MessageAdapter
     public static class SenderViewHolder
             extends RecyclerView.ViewHolder {
 
-        final TextView senderMessage;
-        final TextView senderTime;
-        final TextView seenStatus;
+        final TextView messageText;
+        final TextView timeText;
+        final ImageView messageStatusIcon;
 
         public SenderViewHolder(
                 @NonNull View itemView
@@ -173,19 +227,15 @@ public class MessageAdapter
             super(itemView);
 
 
-            senderMessage =
-                    itemView.findViewById(
-                            R.id.senderMessage
-                    );
+            messageText =
+                    itemView.findViewById(R.id.messageText);
 
-            senderTime =
-                    itemView.findViewById(
-                            R.id.senderTime
-                    );
+            timeText =
+                    itemView.findViewById(R.id.timeText);
 
-            seenStatus =
+            messageStatusIcon =
                     itemView.findViewById(
-                            R.id.seenStatus
+                            R.id.messageStatusIcon
                     );
         }
     }
@@ -197,8 +247,8 @@ public class MessageAdapter
     public static class ReceiverViewHolder
             extends RecyclerView.ViewHolder {
 
-        final TextView receiverMessage;
-        final TextView receiverTime;
+        final TextView messageText;
+        final TextView timeText;
 
         public ReceiverViewHolder(
                 @NonNull View itemView
@@ -206,17 +256,14 @@ public class MessageAdapter
 
             super(itemView);
 
-            receiverMessage =
-                    itemView.findViewById(
-                            R.id.receiverMessage
-                    );
+            messageText =
+                    itemView.findViewById(R.id.messageText);
 
-            receiverTime =
-                    itemView.findViewById(
-                            R.id.receiverTime
-                    );
+            timeText =
+                    itemView.findViewById(R.id.timeText);
         }
     }
+
     private static final SimpleDateFormat formatter =
             new SimpleDateFormat(
                     "hh:mm a",

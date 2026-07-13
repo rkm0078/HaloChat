@@ -22,6 +22,8 @@ public class Message {
 
     public long seenTime;
 
+    public String status;
+
     // Message type
 
     public String type;
@@ -35,6 +37,9 @@ public class Message {
     public String replyToMessageId;
 
     public String reaction;
+
+    public transient boolean isDateChip = false;
+    public transient String dateText = "";
 
     public Message() {
     }
@@ -50,6 +55,7 @@ public class Message {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.timestamp = timestamp;
+        this.status = "sending";
 
         this.type = "text";
         this.imageUrl = "";

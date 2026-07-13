@@ -92,6 +92,57 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
+        FirebaseUser user =
+                FirebaseAuth.getInstance()
+                        .getCurrentUser();
+
+        if (user != null) {
+
+            FirebaseDatabase.getInstance()
+                    .getReference("Users")
+                    .child(user.getUid())
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+
+                        Intent intent;
+
+                        if (snapshot.exists()) {
+
+                            intent = new Intent(
+                                    LoginActivity.this,
+                                    HomeActivity.class
+                            );
+
+                        } else {
+
+                            intent = new Intent(
+                                    LoginActivity.this,
+                                    CompleteProfileActivity.class
+                            );
+
+                            intent.putExtra(
+                                    "fullName",
+                                    user.getDisplayName()
+                            );
+
+                            intent.putExtra(
+                                    "email",
+                                    user.getEmail()
+                            );
+                        }
+
+                        intent.setFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        );
+
+                        startActivity(intent);
+                        finish();
+                    });
+
+            return;
+        }
+
         // BIND UI
 
         email =
@@ -822,62 +873,4 @@ public class LoginActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-
-        FirebaseUser user =
-                FirebaseAuth.getInstance()
-                        .getCurrentUser();
-
-        if (user == null) {
-            return;
-        }
-
-        FirebaseDatabase.getInstance()
-                .getReference("Users")
-                .child(user.getUid())
-                .get()
-                .addOnSuccessListener(snapshot -> {
-
-                    Intent intent;
-
-                    if (snapshot.exists()) {
-
-                        intent =
-                                new Intent(
-                                        LoginActivity.this,
-                                        HomeActivity.class
-                                );
-
-                    } else {
-
-                        intent =
-                                new Intent(
-                                        LoginActivity.this,
-                                        CompleteProfileActivity.class
-                                );
-
-                        intent.putExtra(
-                                "fullName",
-                                user.getDisplayName()
-                        );
-
-                        intent.putExtra(
-                                "email",
-                                user.getEmail()
-                        );
-                    }
-
-                    intent.setFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    );
-
-                    startActivity(intent);
-                    finish();
-                });
-    }
 }

@@ -1,7 +1,14 @@
 package com.rishabh.chatapp;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,19 +19,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.rishabh.chatapp.database.entity.MessageEntity;
 import com.rishabh.chatapp.database.repository.ChatRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
+
 import com.rishabh.chatapp.database.entity.ChatEntity;
 import com.rishabh.chatapp.database.repository.RecentChatRepository;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -32,12 +47,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
 
     private CircleImageView profileImage;
-
+    private ImageView menuBtn;
     private ImageView backBtn;
-
-    private LinearLayout sendBtn;
-
     private EditText messageBox;
+    private ImageView sendIcon;
+    private FrameLayout sendBtn;
+    private ImageView emojiBtn;
+    private ImageView attachBtn;
+    private ImageView cameraBtn;
+
 
     private TextView username;
 
@@ -58,6 +76,8 @@ public class ChatActivity extends AppCompatActivity {
     private String senderRoom;
 
     private String receiverRoom;
+    private ImageView videoCallBtn;
+    private ImageView callBtn;
 
     private boolean isChatOpen = false;
 
@@ -76,18 +96,22 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         profileImage = findViewById(R.id.profileImage);
-
+        emojiBtn = findViewById(R.id.emojiBtn);
+        attachBtn = findViewById(R.id.attachBtn);
+        cameraBtn = findViewById(R.id.cameraBtn);
         backBtn = findViewById(R.id.backBtn);
+        menuBtn = findViewById(R.id.menuBtn);
+        username = findViewById(R.id.nameText);
 
-        sendBtn = findViewById(R.id.sendBtn);
-
-        messageBox = findViewById(R.id.messageBox);
-
-        username = findViewById(R.id.username);
+        chatList = findViewById(R.id.chatRecycler);
 
         statusText = findViewById(R.id.statusText);
+        videoCallBtn = findViewById(R.id.videoCallBtn);
+        callBtn = findViewById(R.id.callBtn);
 
-        chatList = findViewById(R.id.chatList);
+        messageBox = findViewById(R.id.messageBox);
+        sendIcon = findViewById(R.id.sendIcon);
+        sendBtn = findViewById(R.id.sendBtn);
 
         chatRepository = new ChatRepository(this);
 
@@ -165,8 +189,7 @@ public class ChatActivity extends AppCompatActivity {
 
         adapter = new MessageAdapter(
                 this,
-                messages,
-                currentUid
+                messages
         );
 
         LinearLayoutManager manager =
@@ -187,6 +210,8 @@ public class ChatActivity extends AppCompatActivity {
 
                     messages.clear();
 
+                    String lastDate = "";
+
                     for (MessageEntity entity : messageEntities) {
 
                         Message message = new Message();
@@ -196,16 +221,35 @@ public class ChatActivity extends AppCompatActivity {
                         message.senderId = entity.senderId;
                         message.receiverId = entity.receiverId;
                         message.timestamp = entity.timestamp;
+                        message.status = entity.status;
 
-                        message.delivered =
-                                entity.status.equals("delivered")
-                                        || entity.status.equals("seen");
+                        String currentDate =
+                                DATE_FORMAT.format(
+                                        new Date(message.timestamp)
+                                );
+
+                        if (!currentDate.equals(lastDate)) {
+
+                            Message dateChip = new Message();
+
+                            dateChip.isDateChip = true;
+
+                            dateChip.dateText = currentDate;
+
+                            messages.add(dateChip);
+
+                            lastDate = currentDate;
+                        }
 
                         message.deliveredTime =
                                 entity.deliveredTime;
 
+                        message.delivered =
+                                "delivered".equals(entity.status)
+                                        || "seen".equals(entity.status);
+
                         message.seen =
-                                entity.status.equals("seen");
+                                "seen".equals(entity.status);
 
                         messages.add(message);
                     }
@@ -248,9 +292,32 @@ public class ChatActivity extends AppCompatActivity {
 
                                 } else {
 
-                                    statusText.setText(
-                                            "Last seen recently"
-                                    );
+                                    long lastSeen = user.lastSeen;
+
+                                    long diff =
+                                            System.currentTimeMillis() - lastSeen;
+
+                                    long minutes =
+                                            diff / (1000 * 60);
+
+                                    if (minutes < 1) {
+
+                                        statusText.setText("Last seen just now");
+
+                                    } else if (minutes < 60) {
+
+                                        statusText.setText(
+                                                "Last seen " + minutes + " min ago"
+                                        );
+
+                                    } else {
+
+                                        long hours = minutes / 60;
+
+                                        statusText.setText(
+                                                "Last seen " + hours + " hr ago"
+                                        );
+                                    }
                                 }
                             }
 
@@ -320,7 +387,11 @@ public class ChatActivity extends AppCompatActivity {
                         entity.deliveredTime =
                                 message.deliveredTime;
 
-                        if (message.seen) {
+                        if (message.status != null) {
+
+                            entity.status = message.status;
+
+                        } else if (message.seen) {
 
                             entity.status = "seen";
 
@@ -331,6 +402,7 @@ public class ChatActivity extends AppCompatActivity {
                         } else {
 
                             entity.status = "sent";
+
                         }
 
                         if (loadedIds.add(entity.messageId)) {
@@ -378,19 +450,57 @@ public class ChatActivity extends AppCompatActivity {
                             long now =
                                     System.currentTimeMillis();
 
-                            snapshot.getRef()
+                            String messageId = snapshot.getKey();
+
+                            if (messageId == null) {
+                                return;
+                            }
+
+                            DatabaseReference root =
+                                    FirebaseDatabase.getInstance()
+                                            .getReference("Chats");
+
+// Receiver copy
+                            root.child(senderRoom)
+                                    .child(messageId)
                                     .child("delivered")
                                     .setValue(true);
 
-                            snapshot.getRef()
+                            root.child(senderRoom)
+                                    .child(messageId)
                                     .child("deliveredTime")
                                     .setValue(now);
 
-                            snapshot.getRef()
+// Sender copy
+                            root.child(receiverRoom)
+                                    .child(messageId)
+                                    .child("delivered")
+                                    .setValue(true);
+
+                            root.child(receiverRoom)
+                                    .child(messageId)
+                                    .child("deliveredTime")
+                                    .setValue(now);
+
+                            // Receiver copy
+                            root.child(senderRoom)
+                                    .child(messageId)
                                     .child("seen")
                                     .setValue(true);
 
-                            snapshot.getRef()
+                            root.child(senderRoom)
+                                    .child(messageId)
+                                    .child("seenTime")
+                                    .setValue(now);
+
+// Sender copy
+                            root.child(receiverRoom)
+                                    .child(messageId)
+                                    .child("seen")
+                                    .setValue(true);
+
+                            root.child(receiverRoom)
+                                    .child(messageId)
                                     .child("seenTime")
                                     .setValue(now);
                         }
@@ -443,7 +553,11 @@ public class ChatActivity extends AppCompatActivity {
                         entity.deliveredTime =
                                 message.deliveredTime;
 
-                        if (message.seen) {
+                        if (message.status != null) {
+
+                            entity.status = message.status;
+
+                        } else if (message.seen) {
 
                             entity.status = "seen";
 
@@ -454,6 +568,7 @@ public class ChatActivity extends AppCompatActivity {
                         } else {
 
                             entity.status = "sent";
+
                         }
 
                         chatRepository.insertMessage(
@@ -481,6 +596,102 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
+        profileImage.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "User Profile",
+                        "User profile screen is coming soon.",
+                        "OK",
+                        null
+                ));
+
+        username.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "User Profile",
+                        "User profile screen is coming soon.",
+                        "OK",
+                        null
+                ));
+
+        menuBtn.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Chat Options",
+                        "More chat options are coming soon.",
+                        "OK",
+                        null
+                ));
+
+        videoCallBtn.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Video Calls",
+                        "Video calling will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+        callBtn.setOnClickListener(v ->
+                showComingSoonDialog(
+                        "Voice Calls",
+                        "Voice calling will be available in a future HaloChat update.",
+                        "OK",
+                        null
+                ));
+
+
+        messageBox.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after
+            ) {}
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s,
+                    int start,
+                    int before,
+                    int count
+            ) {
+
+                if (s.toString().trim().isEmpty()) {
+
+                    sendIcon.setImageResource(
+                            R.drawable.mic_icon
+                    );
+
+                } else {
+
+                    sendIcon.setImageResource(
+                            R.drawable.send_icon
+                    );
+                }
+            }
+
+            @Override
+            public void afterTextChanged(
+                    Editable s
+            ) {}
+        });
+
+        emojiBtn.setOnClickListener(v ->
+                showComingSoonDialog("Coming Soon",
+                        "Emoji Picker section will be available in a future HaloChat update.",
+                            "OK",
+                        null));
+
+        attachBtn.setOnClickListener(v ->
+                showComingSoonDialog("Coming Soon",
+                        "Attachement section will be available in a future HaloChat update.",
+                        "OK",
+                        null));
+
+        cameraBtn.setOnClickListener(v ->
+                showComingSoonDialog("Coming Soon",
+                        "Camera section will be available in a future HaloChat update.",
+                        "OK",
+                        null));
 
         // =========================
         // SEND MESSAGE
@@ -494,6 +705,14 @@ public class ChatActivity extends AppCompatActivity {
                             .trim();
 
             if (text.isEmpty()) {
+
+                showComingSoonDialog(
+                        "Coming Soon",
+                        "Voice messages are coming soon.",
+                        "OK",
+                        null
+                );
+
                 return;
             }
 
@@ -527,6 +746,7 @@ public class ChatActivity extends AppCompatActivity {
 
             message.seen = false;
             message.seenTime = 0;
+            message.status = "sending";
 
             // Save locally
 
@@ -541,7 +761,7 @@ public class ChatActivity extends AppCompatActivity {
             entity.type = "text";
             entity.imageUrl = "";
 
-            entity.status = "sent";
+            entity.status = "sending";
             entity.delivered = false;
             entity.deliveredTime = 0;
 
@@ -585,19 +805,37 @@ public class ChatActivity extends AppCompatActivity {
 
             // Upload sender copy
 
-            FirebaseDatabase.getInstance()
-                    .getReference("Chats")
-                    .child(senderRoom)
-                    .child(messageId)
-                    .setValue(message);
+            DatabaseReference root =
+                    FirebaseDatabase.getInstance()
+                            .getReference("Chats");
 
-            // Upload receiver copy
+            Task<Void> senderTask =
+                    root.child(senderRoom)
+                            .child(messageId)
+                            .setValue(message);
 
-            FirebaseDatabase.getInstance()
-                    .getReference("Chats")
-                    .child(receiverRoom)
-                    .child(messageId)
-                    .setValue(message);
+            Task<Void> receiverTask =
+                    root.child(receiverRoom)
+                            .child(messageId)
+                            .setValue(message);
+
+            Tasks.whenAll(senderTask, receiverTask)
+
+                    .addOnSuccessListener(unused -> {
+
+                        entity.status = "sent";
+
+                        chatRepository.insertMessage(entity);
+
+                    })
+
+                    .addOnFailureListener(e -> {
+
+                        entity.status = "failed";
+
+                        chatRepository.insertMessage(entity);
+
+                    });
 
             // Update last message
 
@@ -692,6 +930,12 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private static final SimpleDateFormat DATE_FORMAT =
+            new SimpleDateFormat(
+                    "dd MMM yyyy",
+                    Locale.getDefault()
+            );
+
     // =========================
     // ON PAUSE
     // =========================
@@ -715,8 +959,70 @@ public class ChatActivity extends AppCompatActivity {
                     .getReference("Users")
                     .child(currentUid)
                     .child("lastSeen")
-                    .setValue(System.currentTimeMillis());
+                    .setValue(ServerValue.TIMESTAMP);
+
         }
+    }
+
+    private void showComingSoonDialog(
+            String title,
+            String message,
+            String buttonText,
+            Runnable action
+    ) {
+
+        View dialogView =
+                getLayoutInflater().inflate(
+                        R.layout.dialog_coming_soon,
+                        null
+                );
+
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .create();
+
+        if (dialog.getWindow() != null) {
+
+            dialog.getWindow().setBackgroundDrawable(
+                    new ColorDrawable(
+                            Color.TRANSPARENT
+                    )
+            );
+        }
+
+        TextView titleText =
+                dialogView.findViewById(
+                        R.id.titleText
+                );
+
+        TextView messageText =
+                dialogView.findViewById(
+                        R.id.messageText
+                );
+
+        MaterialButton okBtn =
+                dialogView.findViewById(
+                        R.id.okBtn
+                );
+
+        titleText.setText(title);
+
+        messageText.setText(message);
+
+        okBtn.setText(buttonText);
+
+        okBtn.setOnClickListener(v -> {
+
+            dialog.dismiss();
+
+            if (action != null) {
+
+                action.run();
+            }
+        });
+
+        dialog.show();
     }
 
 }

@@ -144,6 +144,10 @@ public class FriendsFragment extends Fragment {
 
     private void updateEmptyState() {
 
+        if (!isAdded() || getView() == null) {
+            return;
+        }
+
         if (contentLayout == null ||
                 emptyLayout == null) {
             return;
@@ -177,6 +181,10 @@ public class FriendsFragment extends Fragment {
 
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        if (!isAdded() || getView() == null) {
+                            return;
+                        }
 
                         friendList.clear();
                         friendAdapter.notifyDataSetChanged();
@@ -239,9 +247,16 @@ public class FriendsFragment extends Fragment {
                                                             }
                                                         }
 
+                                                        if (!isAdded() || getView() == null) {
+                                                            return;
+                                                        }
+
                                                         if (!exists) {
                                                             friendList.add(user);
-                                                            friendAdapter.notifyDataSetChanged();
+
+                                                            if (friendAdapter != null) {
+                                                                friendAdapter.notifyDataSetChanged();
+                                                            }
                                                         }
 
                                                         updateEmptyState();
